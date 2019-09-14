@@ -1,0 +1,12 @@
+Here are a few sample syslog messages. The first message shows the client disconnecting from the wireless, and then the next 4 messages are the different stages of the client connecting to the wireless network:
+
+
+Sep 4 14:52:36 10.45.0.211 stm[1694]: <501105> <NOTI> |AP Kenn101-AP345-2@10.45.0.211 stm| Deauth from sta: 40:ed:98:5f:d5:bc: AP 10.45.0.211-38:17:c3:89:f8:71-Kenn101-AP345-2 Reason STA has left and is deauthenticated
+
+Sep 4 14:52:40 RUP2103-2-A7280-2 stm[7160]: <501218> <7160> <NOTI> <RUP2103-2-A7280-2 10.47.0.33> stm_sta_assign_vlan 19917: VLAN: sta 40:ed:98:5f:d5:bc, STM assigns MAC based vlan_id 1
+Sep 4 14:52:40 RUP2103-2-A7280-2 stm[7160]: <501100> <7160> <NOTI> <RUP2103-2-A7280-2 10.47.0.33> Assoc success @ 14:52:40.965705: 40:ed:98:5f:d5:bc: AP 10.45.0.227-38:17:c3:84:0f:b0-Kenn101-AP345-1
+Sep 4 14:52:41 RUP2103-2-A7280-2 authmgr[7138]: <522038> <7138> <NOTI> <RUP2103-2-A7280-2 10.47.0.33> username=example@uncc.edu MAC=40:ed:98:5f:d5:bc IP=0.0.0.0 Authentication result=Authentication Successful method=802.1x server=radius-atki-et5020-2-10.47.128.40
+Sep 4 14:52:41 RUP2103-2-A7280-2 authmgr[7138]: <522008> <7138> <NOTI> <RUP2103-2-A7280-2 10.47.0.33> User Authentication Successful: username=example@uncc.edu MAC=40:ed:98:5f:d5:bc IP=10.22.24.143 role=ur_role_testing VLAN=105 AP=Kenn101-AP345-1 SSID=eduroam AAA profile=aaa-uncc-dot1x auth method=802.1x auth server=radius-atki-et5020-2-10.47.128.40
+
+
+
