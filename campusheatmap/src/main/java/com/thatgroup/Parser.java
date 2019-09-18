@@ -1,6 +1,8 @@
 package com.thatgroup;
 
 import org.influxdb.*;
+import org.influxdb.dto.BatchPoints;
+import org.influxdb.dto.Point;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,6 +16,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.*;
@@ -77,9 +80,7 @@ public class Parser
     
     private static void getConnectAndDisconnect(Map<Date, ArrayList<String>> mapOfTimes){
         int connect = 0;
-        int connects = 0;
         int disconnect = 0;
-        int disconnects = 0;
         int connected = 0;
 
         SortedSet<Date> keys = new TreeSet<Date>(mapOfTimes.keySet());
@@ -95,7 +96,6 @@ public class Parser
                         if(data.contains("Assoc success")){
                             userConnected.put(mat.group(), true);
                             connect++;
-                            connects++;
                         } else if (data.contains("Deauth")){
                             userConnected.put(mat.group(), false);
                         }
@@ -103,11 +103,9 @@ public class Parser
                     else{ 
                         if(data.contains("Assoc success") && (userConnected.get(mat.group())) == false){
                             connect++;
-                            connects++;
                             userConnected.put(mat.group(), true);
                         } else if (data.contains("Deauth") && userConnected.get(mat.group())){
                             disconnect++;
-                            disconnects++;
                             userConnected.put(mat.group(), false);
                         }
                     }
@@ -116,13 +114,27 @@ public class Parser
             connected += (connect - disconnect);
             connect = 0;
             disconnect = 0;
-            System.out.println("There were " + connected + " at  " + date);
+            addToInflux(date, connected);
         }
     }
 
     private static void addToInflux(Date date, int connected){
         InfluxDB db = InfluxDBFactory.connect("http://localhost:8086");
-        db.createDatabase("TempDataBase");
+        if(!db.databaseExists("TempDataBase")){
+            db.createDatabase("TempDataBase"); 
+        }
 
+        BatchPoints batchPoints = BatchPoints
+            .database("TempDataBase")
+            .build();
+
+        Point point = Point.measurement("users")
+            .time(date.getTime(), TimeUnit.MILLISECONDS)
+            .addField("Connections", connected)
+            .build();
+
+        batchPoints.point(point);
+        db.write(batchPoints);
+        System.out.println("Batchpoint Written " + point.toString());
     }
 }
