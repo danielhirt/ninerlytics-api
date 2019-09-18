@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Parser",
+            "request": "launch",
+            "mainClass": "com.thatgroup.Parser",
+            "projectName": "campusheatmap"
+        }
+    ]
+}
