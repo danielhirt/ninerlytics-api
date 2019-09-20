@@ -42,7 +42,7 @@ public class Parser
 
         for (int i = 0; i < listOfFiles.length; i++) {
             if (listOfFiles[i].isFile()) {
-              System.out.println("File " + listOfFiles[i].getName() + " Lenght of Files " + listOfFiles.length);
+              System.out.println("File " + listOfFiles[i].getName() + " Length of Files " + listOfFiles.length);
               generateHashMap(pathToFolder.toString() + "/" + listOfFiles[i].getName());
             }
         }
