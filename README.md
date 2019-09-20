@@ -28,7 +28,9 @@ In order to run the back-end, some setup is required:
 10) Assuming the previous steps have been successful, this is what you should have so far (with your own path to data dump): 
 
 `Please Enter Data Dump Folder Location:`
+
 `C:\Users\Daniel\Desktop\wifi-data-dumps`
+
 `File Wi-Fi_Logs-9_16_19.txt Length of Files 1`
 
 11) Depending on your system, the parsing and translation to InfluxDB can take a considerable amount of time (5+ minutes). After a minute or two, you should see something like `Batchpoint Written Point [name=users, time=1568607480000, tags={}, precision=MILLISECONDS, fields={Connections=237}]` executing rapidly in the command line, and a subsequent response from the InfluxDB server. 
