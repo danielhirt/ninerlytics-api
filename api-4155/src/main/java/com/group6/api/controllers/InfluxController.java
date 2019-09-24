@@ -2,6 +2,8 @@ package com.group6.api.controllers;
 
 import java.util.List;
 
+import org.influxdb.InfluxDBIOException;
+import org.influxdb.dto.Pong;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +18,9 @@ import com.group6.api.models.UsersPoint;
 import com.group6.api.services.InfluxDBSetupService;
 import com.group6.api.services.InfluxQueryService;
 
-
 /**
  * Business/HTTP layer logic to perform CRUD operations against InfluxDB
+ * 
  * @author Daniel C. Hirt
  */
 @RestController
@@ -41,7 +43,7 @@ public class InfluxController {
 		String query = "SELECT * FROM \"users\"";
 		List<UsersPoint> usersPointList = influxQueryService.getPoints(influxDBSetupService.getConnection(), query,
 				influxDBSetupService.getDatabaseName());
-		
+
 		influxQueryService.setUsersPointList(usersPointList);
 
 		if (usersPointList.size() == 0) {
@@ -49,22 +51,38 @@ public class InfluxController {
 		}
 		return new ResponseEntity<List<UsersPoint>>(usersPointList, HttpStatus.OK);
 	}
-	
+
 	/*
-	 * Inserts a new data point from the front-end (this is a work in progress still to translate to Angular).
+	 * Inserts a new data point from the front-end (this is a work in progress still
+	 * to translate to Angular).
 	 */
 	@PostMapping("/addDataPoint")
 	public ResponseEntity<UsersPoint> addNewDataPoint(@RequestBody UsersPoint newDataPoint) {
-		UsersPoint addedDataPoint = influxQueryService.insertNewDataPoint(influxDBSetupService.getConnection(), 
+		UsersPoint addedDataPoint = influxQueryService.insertNewDataPoint(influxDBSetupService.getConnection(),
 				influxDBSetupService.getDatabaseName(), newDataPoint);
-		
+
 		if (addedDataPoint == null) {
 			return new ResponseEntity<UsersPoint>(addedDataPoint, HttpStatus.BAD_REQUEST);
-		}	
+		}
 		return new ResponseEntity<UsersPoint>(addedDataPoint, HttpStatus.OK);
 	}
-	
 
-	
-	
+	/*
+	 * Tests connection to InfluxDB with a call from the front-end.
+	 */
+	@GetMapping("/testDBConnection")
+	public ResponseEntity<Boolean> testInfluxDBConnection() {
+		boolean connected = true;
+		try {
+			Pong response = influxDBSetupService.getConnection().ping();
+			if (response.getVersion().equalsIgnoreCase("unknown")) {
+				connected = false;
+			}
+		} catch (InfluxDBIOException idbo) {
+			System.out.println("Exception while pinging database from the front-end: " + idbo);
+			return new ResponseEntity<Boolean>(connected, HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<Boolean>(connected, HttpStatus.OK);
+	}
+
 }

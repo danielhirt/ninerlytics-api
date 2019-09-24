@@ -30,7 +30,7 @@ public class InfluxDBSetupService {
 			} else if (connection.databaseExists(databaseName)) {
 				@SuppressWarnings("resource")
 				Scanner scanner = new Scanner(System.in);
-				System.out.println("A database already exists: " + databaseName + "\n" + "Would you like to overwrite it? (Y/N):");
+				System.out.println("A database already exists: " + databaseName + "\n" + "Would you like to overwrite it? (y/n):");
 				String response = scanner.nextLine();
 				
 				if (("y").equals(response.toLowerCase()) || ("yes").equals(response.toLowerCase())) {

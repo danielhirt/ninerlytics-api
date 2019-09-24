@@ -7,7 +7,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class Api4155ApplicationTests {
+public class SpringAPIHarnessTests {
 
 	@Test
 	public void contextLoads() {
