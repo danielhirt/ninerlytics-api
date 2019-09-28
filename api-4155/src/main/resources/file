@@ -1,0 +1,8 @@
+Sep 16 23:59:59 RUP2103-2-A7280-1 stm[2144]: <501100> <2144> <NOTI> <RUP2103-2-A7280-1 10.47.0.32>  Assoc success @ 23:59:59.967402: 14:c2:13:cc:3b:74: AP 10.45.81.54-38:17:c3:82:d7:21-StuU140-AP345-3
+Sep 16 23:59:59 RUP2103-2-A7280-1 stm[2144]: <501080> <2144> <NOTI> <RUP2103-2-A7280-1 10.47.0.32>  Deauth to sta: 14:c2:13:cc:3b:74: Ageout AP 10.45.81.10-38:17:c3:82:d4:71-StuU140-AP345-2 STA has roamed to another AP
+Sep 16 23:59:59 10.45.83.70 stm[2978]:  <501080> <NOTI> |AP Wood330-AP345-2@10.45.83.70 stm|  Deauth to sta: 3c:15:c2:ca:b2:12: Ageout AP 10.45.83.70-90:4c:81:8e:8a:01-Wood330-AP345-2 Client Match
+Sep 16 23:59:59 10.44.134.236 stm[4650]:  <501105> <NOTI> |AP Colv2102-AP325-1@10.44.134.236 stm|  Deauth from sta: 90:cd:b6:13:87:89: AP 10.44.134.236-40:e3:d6:51:c0:c2-Colv2102-AP325-1 Reason Ptk Challenge Failed
+Sep 16 23:59:59 10.47.0.22 stm[1806]: <501080> <3789> <NOTI> < 10.47.0.22>  Deauth to sta: 90:cd:b6:13:87:89: Ageout AP 10.44.134.236-40:e3:d6:51:c0:c2-Colv2102-AP325-1 Ptk Challenge Failed
+Sep 16 23:59:59 10.47.0.22 stm[1806]: <501106> <3789> <NOTI> < 10.47.0.22>  Deauth to sta: 90:cd:b6:13:87:89: Ageout AP 10.44.134.236-40:e3:d6:51:c0:c2-Colv2102-AP325-1 wifi_deauth_sta
+Sep 16 23:59:59 RUP2103-2-A7280-2 stm[7160]: <501100> <7160> <NOTI> <RUP2103-2-A7280-2 10.47.0.33>  Assoc success @ 23:59:59.292236: d8:9c:67:3c:6d:53: AP 10.44.196.134-40:e3:d6:52:93:50-McEn307-AP325-1
+Sep 16 23:59:59 AtkiG20-C5-A7280-2 stm[2085]: <501100> <2085> <NOTI> <AtkiG20-C5-A7280-2 10.47.0.23>  Assoc success @ 23:59:59.186330: 00:17:23:e2:08:52: AP 10.44.26.82-f0:5c:19:b9:0d:20-EXT-McCoC126-AP277-1
