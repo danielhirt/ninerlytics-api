@@ -34,7 +34,7 @@ import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
  * @author Daniel C. Hirt
  */
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://192.168.0.1:80")
 @RequestMapping("/api/v1")
 public class InfluxController {
 
