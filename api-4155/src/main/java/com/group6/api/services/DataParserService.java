@@ -31,10 +31,10 @@ public class Parser {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please Enter Data Dump Folder Location:");
 
-        // String pathToFolder = scanner.nextLine();
+        String pathToFolder = scanner.nextLine();
 
         // Temp HardCode
-        String pathToFolder = "C:/Users/Atom2/Documents/Repo";
+        //String pathToFolder = "";
 
         File folder = new File(pathToFolder.toString());
         File[] listOfFiles = folder.listFiles();
