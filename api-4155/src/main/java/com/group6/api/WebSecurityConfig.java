@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
  * Disables Spring security features to allow cross origin requests. 
  * NOTE: This removes protection against cross-site forgery. Only for use in development. 
  */
-
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {

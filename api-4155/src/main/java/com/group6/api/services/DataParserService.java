@@ -15,17 +15,22 @@ import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 /**
  * Service layer logic to handle parsing of data dumps for persistence in InfluxDB instance.
  * @author Matthew Walter, Daniel C. Hirt
  */
 @Service
-public class DataParserService {
+public class DataParserService extends Thread {
+	
+	@Autowired
+	InfluxDBSetupService influxDBService;
 	
 
     public void findFiles() {
@@ -49,7 +54,8 @@ public class DataParserService {
        
     }
 
-    private static void generateHashMap(String pathToFile) {
+  
+    public void generateHashMap(String pathToFile) {
         
         try {
             Map<Date, ArrayList<String>> mapOfTimes = new HashMap<Date, ArrayList<String>>();
@@ -80,7 +86,8 @@ public class DataParserService {
         }
     }
     
-    private static void getConnectAndDisconnect(Map<Date, ArrayList<String>> mapOfTimes) {
+    
+    private void getConnectAndDisconnect(Map<Date, ArrayList<String>> mapOfTimes) {
        
         int connect = 0;
         int disconnect = 0;
@@ -126,7 +133,7 @@ public class DataParserService {
         }
     }
 
-    private static void addToInflux(Date date, int connected, int disconnected, int idNumber) {
+    private void addToInflux(Date date, int connected, int disconnected, int idNumber) {
     	
     	InfluxDB connection = InfluxDBFactory.connect("http://localhost:8086");
     	
