@@ -9,15 +9,17 @@ import org.influxdb.dto.Pong;
 import org.springframework.stereotype.Service;
 
 /**
- * Service layer logic to perform initialization and status checks against InfluxDB instance. 
+ * Service layer logic to perform initialization and status checks against
+ * InfluxDB instance.
+ * 
  * @author Daniel C. Hirt
  */
 
 @Service
 public class InfluxDBSetupService {
 
-	private String databaseURL = "http://localhost:8086";
-	private String databaseName = "devDB";
+	private String databaseURL = "http://192.168.0.1:8086";
+	private String databaseName = "totalConnectedUsers";
 	private InfluxDB connection = InfluxDBFactory.connect(databaseURL);
 
 	public boolean connectToInfluxDB() {
@@ -26,35 +28,15 @@ public class InfluxDBSetupService {
 
 			if (!connection.databaseExists(databaseName)) {
 				connection.createDatabase(databaseName);
-				connection.createRetentionPolicy("defaultPolicy", "devDB", "30d", 1, true);
+				// connection.createRetentionPolicy("defaultPolicy", "totalConnectedUsers",
+				// "30d", 1, true);
 				this.setConnection(connection);
-				return true;
-			} else if (connection.databaseExists(databaseName)) {
-				@SuppressWarnings("resource")
-				Scanner scanner = new Scanner(System.in);
-				System.out.println("A database already exists: " + databaseName + "\n" + "Would you like to overwrite it? (y/n):");
-				String response = scanner.nextLine();
-				
-				if (("y").equals(response.toLowerCase()) || ("yes").equals(response.toLowerCase())) {
-					connection.deleteDatabase(databaseName);
-					connection.createDatabase(databaseName);
-					connection.createRetentionPolicy("defaultPolicy", "devDB", "30d", 1, true);
-					this.setConnection(connection);
-					
-			
-				} else {
-					return true;
-				}
-				
+
 			}
 
-		} else if (!this.testInfluxDBConnection(connection)) {
-			System.out.println("\n" + "Please verify the InfluxDB server is running and try again.");
-			return false;
 		}
-		
+		this.setConnection(connection);
 		return true;
-
 	}
 
 	public boolean testInfluxDBConnection(InfluxDB connection) {
@@ -78,7 +60,6 @@ public class InfluxDBSetupService {
 		}
 
 	}
-
 
 	public InfluxDB getConnection() {
 		return connection;
@@ -104,6 +85,4 @@ public class InfluxDBSetupService {
 		this.databaseName = databaseName;
 	}
 
-
-	
 }

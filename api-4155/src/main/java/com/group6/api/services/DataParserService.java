@@ -135,7 +135,7 @@ public class DataParserService extends Thread {
 
     private void addToInflux(Date date, int connected, int disconnected, int idNumber) {
     	
-    	InfluxDB connection = InfluxDBFactory.connect("http://localhost:8086");
+    	InfluxDB connection = InfluxDBFactory.connect("http://192.168.0.1:8086");
     	
         BatchPoints batchPoints = BatchPoints
             .database("devDB")
