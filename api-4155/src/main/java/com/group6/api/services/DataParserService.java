@@ -1,12 +1,8 @@
-package com.thatgroup;
-
-import org.influxdb.*;
-import org.influxdb.dto.BatchPoints;
-import org.influxdb.dto.Point;
+package com.group6.api.services;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.nio.file.*;
+import java.io.FileReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,41 +15,53 @@ import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.io.*;
 
-public class Parser {
-    public static void main(String[] args) {
-        
-        findFiles();
+import org.influxdb.InfluxDB;
+import org.influxdb.InfluxDBFactory;
+import org.influxdb.dto.BatchPoints;
+import org.influxdb.dto.Point;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+/**
+ * Service layer logic to handle parsing of data dumps for persistence in InfluxDB instance.
+ * @author Matthew Walter, Daniel C. Hirt
+ */
+@Service
+public class DataParserService extends Thread {
+	
+	@Autowired
+	InfluxDBSetupService influxDBService;
+	
 
-    }
+    public void findFiles() {
 
-    private static void findFiles() {
-
-        Scanner scanner = new Scanner(System.in);
+        @SuppressWarnings("resource")
+		Scanner scanner = new Scanner(System.in);
 
         System.out.println("Please Enter Data Dump Folder Location:");
         String pathToFolder = scanner.nextLine();
 
         File folder = new File(pathToFolder.toString());
         File[] listOfFiles = folder.listFiles();
-
+        
         for (int i = 0; i < listOfFiles.length; i++) {
             if (listOfFiles[i].isFile()) {
               System.out.println("File: " + listOfFiles[i].getName() + " Length of files: " + listOfFiles.length);
               generateHashMap(pathToFolder.toString() + "/" + listOfFiles[i].getName());
             }
         }
+        
+       
     }
 
-    private static void generateHashMap(String pathToFile) {
+  
+    public void generateHashMap(String pathToFile) {
         
         try {
             Map<Date, ArrayList<String>> mapOfTimes = new HashMap<Date, ArrayList<String>>();
 
             BufferedReader br = new BufferedReader(new FileReader(pathToFile));
     
-            StringBuilder sb = new StringBuilder();
             String line = br.readLine();
 
             DateFormat format = new SimpleDateFormat("yyyy MMM dd HH:mm");
@@ -78,12 +86,14 @@ public class Parser {
         }
     }
     
-    private static void getConnectAndDisconnect(Map<Date, ArrayList<String>> mapOfTimes) {
+    
+    private void getConnectAndDisconnect(Map<Date, ArrayList<String>> mapOfTimes) {
        
         int connect = 0;
         int disconnect = 0;
         int connected = 0;
         int disconnected = 0;
+        int idNumber = 0;
 
         SortedSet<Date> keys = new TreeSet<Date>(mapOfTimes.keySet());
         Map<String, Boolean> userConnected = new HashMap<String, Boolean>();
@@ -117,30 +127,29 @@ public class Parser {
             connected += (connect - disconnect);
             connect = 0;
             disconnect = 0;
-            addToInflux(date, connected, disconnected);
+            
+            idNumber++;
+            addToInflux(date, connected, disconnected, idNumber);
         }
     }
 
-    private static void addToInflux(Date date, int connected, int disconnected) {
-
-        InfluxDB db = InfluxDBFactory.connect("http://localhost:8086");
-
-        if (!db.databaseExists("devDB")) {
-            db.createDatabase("devDB"); 
-        }
-
+    private void addToInflux(Date date, int connected, int disconnected, int idNumber) {
+    	
+    	InfluxDB connection = InfluxDBFactory.connect("http://localhost:8086");
+    	
         BatchPoints batchPoints = BatchPoints
             .database("devDB")
             .build();
 
         Point point = Point.measurement("users")
             .time(date.getTime(), TimeUnit.MILLISECONDS)
+            .addField("id", idNumber)
             .addField("Connections", connected)
             .addField("Disconnects/Roamed", disconnected)
             .build();
 
         batchPoints.point(point);
-        db.write(batchPoints);
+        connection.write(batchPoints);
         System.out.println("Batchpoint Written: " + point.toString());
     }
 }
