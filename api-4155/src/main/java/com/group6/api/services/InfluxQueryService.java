@@ -36,6 +36,8 @@ public class InfluxQueryService {
 		InfluxDBResultMapper resultMapper = new InfluxDBResultMapper();
 		List<UsersPoint> list = resultMapper.toPOJO(queryResult, UsersPoint.class);
 		System.out.println("Size of user point list: " + usersPointList.size());
+		
+		this.setUsersPointList(list);
 
 		return list;
 

@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.group6.api.services.FileService;
 
 @RestController
-@CrossOrigin(origins = "http://192.168.0.1:80")
 @RequestMapping("/api/v1/files")
 public class FileController {
 	

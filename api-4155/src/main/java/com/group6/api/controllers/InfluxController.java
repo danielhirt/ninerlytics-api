@@ -34,7 +34,6 @@ import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
  * @author Daniel C. Hirt
  */
 @RestController
-@CrossOrigin(origins = "http://192.168.0.1:80")
 @RequestMapping("/api/v1")
 public class InfluxController {
 
@@ -46,6 +45,15 @@ public class InfluxController {
 
 	@Autowired
 	private FileService fileService;
+	
+	/*
+	 * DEBUG METHOD
+	 */
+	@GetMapping("/test")
+	private ResponseEntity<String> testAPIConnection() {
+		return new ResponseEntity<String>("success", HttpStatus.OK);
+	
+	}
 
 	/*
 	 * Return entire parsed dataset to the front-end.
@@ -53,15 +61,15 @@ public class InfluxController {
 	@GetMapping("/connections")
 	private ResponseEntity<List<UsersPoint>> getListOfConnections() {
 
-		String query = "SELECT * FROM \"users\"";
+		String query = "SELECT * FROM \"Connections\"";
 		List<UsersPoint> usersPointList = influxQueryService.getPoints(influxDBSetupService.getConnection(), query,
 				influxDBSetupService.getDatabaseName());
 
-		influxQueryService.setUsersPointList(usersPointList);
+		//influxQueryService.setUsersPointList(usersPointList);
 
-		if (usersPointList.size() == 0) {
+		/*if (usersPointList == null) {
 			return new ResponseEntity<List<UsersPoint>>(usersPointList, HttpStatus.BAD_REQUEST);
-		}
+		}*/
 		return new ResponseEntity<List<UsersPoint>>(usersPointList, HttpStatus.OK);
 	}
 

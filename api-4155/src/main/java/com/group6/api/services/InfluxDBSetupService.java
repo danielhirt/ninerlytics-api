@@ -20,7 +20,7 @@ public class InfluxDBSetupService {
 
 	private String databaseURL = "http://192.168.0.1:8086";
 	private String databaseName = "totalConnectedUsers";
-	private InfluxDB connection = InfluxDBFactory.connect(databaseURL);
+	private InfluxDB connection = InfluxDBFactory.connect(databaseURL, "admin", "admin");
 
 	public boolean connectToInfluxDB() {
 
