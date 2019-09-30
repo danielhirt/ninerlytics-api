@@ -1,8 +1,11 @@
 package com.thatgroup;
 
-import org.influxdb.*;
+import org.influxdb.InfluxDB;
+import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.nio.file.*;
 import java.text.DateFormat;
@@ -21,7 +24,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.*;
 
-public class Parser {
+
+/**
+ * Service layer logic to handle parsing of data dumps for persistence in InfluxDB instance.
+ * @author Matthew Walter, Daniel C. Hirt
+ */
+@Service
+public class DataParserService extends Thread {
+	
+	@Autowired
+	InfluxDBSetupService influxDBService;
     public static void main(String[] args) {
         findFiles();
     }
@@ -47,7 +59,8 @@ public class Parser {
         }
     }
 
-    private static void generateHashMap(String pathToFile) {
+
+    public void generateHashMap(String pathToFile) {
         try {
             Map<Date, ArrayList<String>> mapOfTimes = new HashMap<Date, ArrayList<String>>();
 
@@ -76,7 +89,8 @@ public class Parser {
         }
     }
 
-    private static void getConnectAndDisconnect(Map<Date, ArrayList<String>> mapOfTimes) {
+
+    private void getConnectAndDisconnect(Map<Date, ArrayList<String>> mapOfTimes) {
         SortedSet<Date> keys = new TreeSet<Date>(mapOfTimes.keySet());
 
         Map<Date, Map<String, ArrayList<String>>> macMap = new HashMap<Date, Map<String, ArrayList<String>>>();
@@ -110,7 +124,7 @@ public class Parser {
 
     }
 
-    private static void mapBuildings(Map<Date, Map<String, ArrayList<String>>> macMap, InfluxDB db){
+    private void mapBuildings(Map<Date, Map<String, ArrayList<String>>> macMap, InfluxDB db){
         String[] buildings = {"Atki", "Barn", "Bioi", "Came", "CoEd", "Colv", "Cone", "Duke", "EPIC", "Faci", "FOPS", "Foun", "Fret", "Gade", "Grig", "Kenn", "King", "Laur", "Levi", 
         "Lync", "Macy", "McMi", "Memo", "PORT", "Pros", "Robi", "Rowe", "Smit", "Stor", "StuU", "With", "Winn", "Wood", "HunH", "BelH", "CenC", "SVDH", "Tenn", "Harr", "RUP", "BandCor2", "StuH", 
         "Heal", "Unio", "Stu-A", "Coun"};
@@ -146,7 +160,7 @@ public class Parser {
         putDataIntoInflux(buildingsData, db);
     }
 
-    private static void putDataIntoInflux(Map<Date, ArrayList<String>> buildingsData, InfluxDB db){
+    private void putDataIntoInflux(Map<Date, ArrayList<String>> buildingsData, InfluxDB db){
         String[] buildings = {"Atki", "Barn", "Bioi", "Came", "CoEd", "Colv", "Cone", "Duke", "EPIC", "Faci", "FOPS", "Foun", "Fret", "Gade", "Grig", "Kenn", "King", "Laur", "Levi", 
         "Lync", "Macy", "McMi", "Memo", "PORT", "Pros", "Robi", "Rowe", "Smit", "Stor", "StuU", "With", "Winn", "Wood", "HunH", "BelH", "CenC", "SVDH", "Tenn", "Harr", "RUP", "BandCor2", "StuH", 
         "Heal", "Unio", "Stu-A", "Coun"};

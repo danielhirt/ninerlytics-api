@@ -5,6 +5,8 @@ import java.time.Instant;
 import org.influxdb.annotation.Column;
 import org.influxdb.annotation.Measurement;
 
+import com.opencsv.bean.CsvBindByPosition;
+
 /**
  * POJO/data model representing the "users" measurement persisted to InfluxDB instance. 
  * @author Daniel C. Hirt
@@ -12,18 +14,32 @@ import org.influxdb.annotation.Measurement;
 @Measurement(name = "users")
 public class UsersPoint {
 
+	@CsvBindByPosition(position = 0)
 	@Column(name = "time")
 	private Instant time;
 	
+    @CsvBindByPosition(position = 1)
 	@Column(name = "id")
 	private Integer id;
 	
+    @CsvBindByPosition(position = 2)
 	@Column(name = "Connections")
 	private Integer connections;
 	
+    @CsvBindByPosition(position = 3)
 	@Column(name = "Disconnects/Roamed")
 	private Integer disconnections;
+	
 
+	public UsersPoint(Instant time, Integer id, Integer connections, Integer disconnections) {
+		this.time = time;
+		this.id = id;
+		this.connections = connections;
+		this.disconnections = disconnections;
+	}
+
+	public UsersPoint() {}
+	
 	public Instant getTime() {
 		return time;
 	}

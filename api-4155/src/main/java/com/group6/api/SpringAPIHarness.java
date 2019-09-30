@@ -21,8 +21,7 @@ public class SpringAPIHarness {
 		System.out.println("****************************************4155 API v0.0.1***************************************");
 		System.out.println("**********************************************************************************************" + "\n");
 		System.out.println("Connecting to InfluxDB..." + "\n");
-		Thread.sleep(5000);
-		
+
 		InfluxDBSetupService influxDBSetupService = new InfluxDBSetupService();
 
 		if (influxDBSetupService.connectToInfluxDB()) {

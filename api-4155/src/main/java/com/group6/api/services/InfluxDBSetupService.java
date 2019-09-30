@@ -1,6 +1,7 @@
 package com.group6.api.services;
 
 import java.util.Scanner;
+
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.InfluxDBIOException;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
  * Service layer logic to perform initialization and status checks against InfluxDB instance. 
  * @author Daniel C. Hirt
  */
+
 @Service
 public class InfluxDBSetupService {
 
@@ -20,7 +22,7 @@ public class InfluxDBSetupService {
 
 	public boolean connectToInfluxDB() {
 
-		if (testInfluxDBConnection(connection)) {
+		if (this.testInfluxDBConnection(connection)) {
 
 			if (!connection.databaseExists(databaseName)) {
 				connection.createDatabase(databaseName);
@@ -46,7 +48,7 @@ public class InfluxDBSetupService {
 				
 			}
 
-		} else if (!testInfluxDBConnection(connection)) {
+		} else if (!this.testInfluxDBConnection(connection)) {
 			System.out.println("\n" + "Please verify the InfluxDB server is running and try again.");
 			return false;
 		}
@@ -55,7 +57,7 @@ public class InfluxDBSetupService {
 
 	}
 
-	private static boolean testInfluxDBConnection(InfluxDB connection) {
+	public boolean testInfluxDBConnection(InfluxDB connection) {
 
 		try {
 			Pong response = connection.ping();
