@@ -36,7 +36,7 @@ In order to run the back-end, some setup is required:
 
 5) Import the back-end code as a Maven project (using Eclipse or something similar) and wait for the resources to download. 
 
-![import-image](/back-end-4155/setup-images/import.png)
+![import-image](https://github.com/danielhirt/back-end-4155/blob/develop/setup-images/import.png)
 
 6) On the command line, change directory to the back-end code (back-end-4155), then change directory to the "api-4155" folder.
 
@@ -46,7 +46,7 @@ In order to run the back-end, some setup is required:
 
 9) Assuming the previous steps have been successful, this is what you should have so far (with your own path to data dump): 
 
-![run-image](/back-end-4155/setup-images/run.jpg)
+![run-image](https://github.com/danielhirt/back-end-4155/blob/develop/setup-images/run.jpg)
 
 10) Depending on your system, the parsing and translation to InfluxDB can take a considerable amount of time (5+ minutes). Please be patient here, even if it doesn't look like anything is happening... it is indeed processing the data. 
 
@@ -60,7 +60,7 @@ executing rapidly in the terminal, and a subsequent response from the InfluxDB s
 
 12) You can verify this newly parsed data is InfluxDB by running the Influx CLI (influx.exe):
 
-![influx-image](/back-end-4155/setup-images/influx.jpg)
+![influx-image](https://github.com/danielhirt/back-end-4155/blob/develop/setup-images/influx.jpg)
 
 The above query selects all of the connection data we have on Atkins. This can be done for any of the buildings we have parsed (can find this list in the API).
 
