@@ -22,22 +22,6 @@ public class InfluxControllerTestSuite {
 	@Autowired
 	private InfluxQueryService influxQueryService;
 
-	
-	/*
-	 * Method to test adding new data to InfluxDB
-	 */
-	@PostMapping("/testingpost")
-	public ResponseEntity<UsersPoint> testPost() {
-		
-		UsersPoint newDataPoint = influxQueryService.getUsersPointList().get(0);
-		UsersPoint addedDataPoint = influxQueryService.insertNewDataPoint(influxDBSetupService.getConnection(), 
-				influxDBSetupService.getDatabaseName(), newDataPoint);
-		
-		if (addedDataPoint == null) {
-			return new ResponseEntity<UsersPoint>(addedDataPoint, HttpStatus.BAD_REQUEST);
-		}
-		
-		return new ResponseEntity<UsersPoint>(addedDataPoint, HttpStatus.OK);
-	}
+
 	
 }

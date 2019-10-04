@@ -32,6 +32,7 @@ public class FileService {
 	@Autowired
 	private DataParserService dataParserService;
 	
+	@SuppressWarnings("unused")
 	@Autowired
 	private InfluxQueryService influxQueryService;
 
@@ -89,8 +90,8 @@ public class FileService {
 			
 			List<String[]> rows = new LinkedList<String[]>();
 			for (UsersPoint list: usersPointList) {
-				rows.add(new String[]{"users",list.getTime().toString(),list.getConnections().toString(),
-						list.getDisconnections().toString(),list.getId().toString()});		
+				rows.add(new String[]{"users",list.getTime().toString(),list.getBuilding().toString(),list.getConnections().toString(),
+						list.getDisconnections().toString()});		
 			}
 			writer.writeAll(rows);
 			writer.close();
@@ -107,10 +108,10 @@ public class FileService {
 	/*
 	 * Logic to generate a CSV file for use in Jupyter for Carson <3
 	 */
-	public List<UsersPoint> getUsers() {
+	public List<UsersPoint> getUsers(List<UsersPoint> csvList) {
 		List<UsersPoint> users = new ArrayList<>();
-		for (UsersPoint list: influxQueryService.getUsersPointList()) {
-			users.add(new UsersPoint(list.getTime(), list.getConnections(), list.getDisconnections(), list.getId()));		
+		for (UsersPoint list: csvList) {
+			users.add(new UsersPoint(list.getTime(), list.getBuilding(), list.getConnections(), list.getDisconnections()));		
 		}
 		
 		return users;

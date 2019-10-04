@@ -1,13 +1,8 @@
 package com.group6.api.services;
 
-import org.influxdb.InfluxDB;
-import org.influxdb.InfluxDBFactory;
-import org.influxdb.dto.BatchPoints;
-import org.influxdb.dto.Point;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.nio.file.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,63 +11,41 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.io.*;
-
-
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.nio.file.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.io.*;
 
 
 /**
  * Service layer logic to handle parsing of data dumps for persistence in InfluxDB instance.
  * @author Matthew Walter, Daniel C. Hirt
+ * 
+ * @version LOCAL DEVELOPMENT
  */
 @Service
 public class DataParserService extends Thread {
 	
 	@Autowired
 	InfluxDBSetupService influxDBService;
-	
-    public static void main(String[] args) {
-        findFiles();
-    }
+
 
     // Get all the files in any given folder
-    private static void findFiles() {
-        Scanner scanner = new Scanner(System.in);
+    public void findFiles() {
+    	
+        @SuppressWarnings("resource")
+		Scanner scanner = new Scanner(System.in);
         System.out.println("Please Enter Data Dump Folder Location:");
 
         String pathToFolder = scanner.nextLine();
 
-        // Temp HardCode
-        //String pathToFolder = "";
 
         File folder = new File(pathToFolder.toString());
         File[] listOfFiles = folder.listFiles();
@@ -87,12 +60,12 @@ public class DataParserService extends Thread {
 
 
     public void generateHashMap(String pathToFile) {
+    	
         try {
             Map<Date, ArrayList<String>> mapOfTimes = new HashMap<Date, ArrayList<String>>();
 
             BufferedReader br = new BufferedReader(new FileReader(pathToFile));
 
-            StringBuilder sb = new StringBuilder();
             String line = br.readLine();
 
             DateFormat format = new SimpleDateFormat("yyyy MMM dd HH:mm");
@@ -121,7 +94,7 @@ public class DataParserService extends Thread {
 
         Map<Date, Map<String, ArrayList<String>>> macMap = new HashMap<Date, Map<String, ArrayList<String>>>();
 
-        InfluxDB db = InfluxDBFactory.connect("http://69.195.159.150:8086", "admin", "admin");
+        InfluxDB db = InfluxDBFactory.connect("http://localhost:8086", "admin", "admin");
 
         for (Date date : keys) {
             Map<String, ArrayList<String>> userConnected = new HashMap<String, ArrayList<String>>();
@@ -182,7 +155,7 @@ public class DataParserService extends Thread {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //addConnectedToInflux(date, connected, db);
+        // DEPRECATED: addConnectedToInflux(date, connected, db);
         putDataIntoInflux(buildingsData, db);
     }
 
@@ -192,7 +165,7 @@ public class DataParserService extends Thread {
         "Heal", "Unio", "Stu-A", "Coun"};
 
         BatchPoints batchPoints = BatchPoints
-        .database("connectedUsersWithBuilding")
+        .database("connectedUsersWithBuildingDEV")
         .build();
 
         for(Date date : buildingsData.keySet()){
@@ -211,8 +184,9 @@ public class DataParserService extends Thread {
                         connects++;
                     }
                 }
-                int connected = connects - disconnects;
-                batchPoints = createPoint(date, connects, building, db, batchPoints);
+                
+                // DEPRECATED: int connected = connects - disconnects;
+                batchPoints = createPoint(date, connects, disconnects, building, db, batchPoints);
             }
             
         }
@@ -220,20 +194,28 @@ public class DataParserService extends Thread {
     }
 
     private static void uploadBatchpoints(InfluxDB db, BatchPoints batchPoints){
-        if(!db.databaseExists("connectedUsersWithBuilding")){
-            db.createDatabase("connectedUsersWithBuilding"); 
+        if(!db.databaseExists("connectedUsersWithBuildingDEV")){
+            db.createDatabase("connectedUsersWithBuildingDEV"); 
         }
         db.write(batchPoints);
+        
+        System.out.println("PARSE SUCCESS!" + "\n");
+        System.out.println("API initialized and listening on port 8080" + 
+				"\n" + "Spring Framework Version: 2.1.8-RELEASE" 
+					 + "\n" + "Java Version: 1.8");
+        
     }
 
-    private static BatchPoints createPoint(Date date, int connected, String building, InfluxDB db, BatchPoints batchPoints){
-        Point point = Point.measurement("Connections")
+    private static BatchPoints createPoint(Date date, int connected, int disconnected, String building, InfluxDB db, BatchPoints batchPoints){
+        Point point = Point.measurement("connectionsByBuilding")
             .time(date.getTime(), TimeUnit.MILLISECONDS)
             .tag("Building", building)
             .addField("Connected", connected)
+            .addField("Disconnected", disconnected)
             .build();
 
         batchPoints.point(point);
+        System.out.println("Batchpoint Written: " + point.toString());
         return batchPoints;
     }
 }

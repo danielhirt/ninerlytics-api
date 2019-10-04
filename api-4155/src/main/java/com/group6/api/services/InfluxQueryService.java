@@ -1,16 +1,16 @@
 package com.group6.api.services;
 
-import java.util.ArrayList;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import org.influxdb.InfluxDB;
-import org.influxdb.dto.BatchPoints;
-import org.influxdb.dto.Point;
+
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
 import org.influxdb.impl.InfluxDBResultMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.group6.api.models.UsersPoint;
 
 
@@ -24,25 +24,57 @@ public class InfluxQueryService {
 	@Autowired
 	private InfluxDBSetupService influxDBSetupService;
 
-	private List<UsersPoint> usersPointList = new ArrayList<UsersPoint>();
 	
 	/*
-	 * Executes a new query against InfluxDB to retreive user connection data. 
+	 * Executes a new query against InfluxDB to retrieve connection data specified by query
 	 */
-
-	public List<UsersPoint> getPoints(InfluxDB connection, String query, String databaseName) {
-	
-		QueryResult queryResult = connection.query(new Query(query, databaseName));	
+	public List<UsersPoint> processInfluxQuery(String query) {
+		QueryResult queryResult = influxDBSetupService.getConnection().query(new Query(query, influxDBSetupService.getDatabaseName()));	
 		InfluxDBResultMapper resultMapper = new InfluxDBResultMapper();
 		List<UsersPoint> list = resultMapper.toPOJO(queryResult, UsersPoint.class);
-		System.out.println("Size of user point list: " + usersPointList.size());
+		System.out.println("Size of list: " + list.size());
 		
-		this.setUsersPointList(list);
-
+		DateFormat formatter = new SimpleDateFormat("yyyy MMM dd HH:mm");
+		
+		for (UsersPoint obj : list) {
+			Date dateFormat = Date.from(obj.getTime());
+			String formattedDate = formatter.format(dateFormat);
+			obj.setDateAndTime(formattedDate);
+	
+		}
+		
 		return list;
-
+		
 	}
-
+	
+	/*
+	 * Method to construct queries for use when generating CSVs of data from the front-end
+	 */	
+	public String queryConstructor(String dataSet) {
+		
+		String query = null;
+		
+		// parameter from front-end following format example "building-Atki"
+		if (dataSet.contains("building")) { 
+			
+			dataSet = dataSet.substring(9, 12);
+			query = "SELECT * FROM \"connectionsByBuilding\" WHERE \"Building\" =" + "\'" + dataSet +"\'";
+			
+		} else if (dataSet.equals("all")) {	
+			
+			query = "SELECT * FROM \"connectionsByBuilding\"";
+		}
+		
+		return query;
+	}
+	
+	
+	
+	/*
+	 * DEPRECATED: WILL BREAK API DO NOT MODIFY OR UNCOMMENT
+	 */
+	
+	/*
 	public UsersPoint insertNewDataPoint(InfluxDB connection, String databaseName, UsersPoint newPoint) {
 
 		if (usersPointList != null && newPoint != null) {
@@ -76,13 +108,8 @@ public class InfluxQueryService {
 		
 	
 	}
+	
+	*/
 
-	public List<UsersPoint> getUsersPointList() {
-		return usersPointList;
-	}
-
-	public void setUsersPointList(List<UsersPoint> usersPointList) {
-		this.usersPointList = usersPointList;
-	}
 
 }
