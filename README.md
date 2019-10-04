@@ -7,9 +7,9 @@ Documentation Author: Daniel Hirt, dhirt@uncc.edu
 
 API Development Version: **v1.0.2-SPRT-1**
 
-API Deployment Version:  **v1.0.2-PROD**
+API Deployment Version:  **v1.0.2-SPRT-1-PROD**
 
-"campusheatmap" is **DEPRECATED**
+Note: "campusheatmap" is **DEPRECATED**
 
 #### Dependencies
 
@@ -106,17 +106,19 @@ There is a separate entry point for the file upload/download functions:
 
 `{address}:8080/api/v1/files/{endpoint}`
 
-Request Flow: Angular client --> API Gateway --> Web Controller --> Service(s) --> Web Controller --> JSON --> Angular client
+Request Flow: 
 
-##### Utilization Data by Building
+`Angular client --> API Gateway --> Web Controller --> Service(s) --> Web Controller --> JSON --> Angular client`
+
+### Utilization Data by Building
 
 HTTP Method: GET
+
 Description: Returns a list of point objects, each containing connection, disconnection, building, and date/time data. 
 
 ```
 @GetMapping("/connectionsByBuilding/b={building}")
 private ResponseEntity<List<UsersPoint>> getConnectionDataByBuilding(@PathVariable String building)
-
 ```
 Path Variable `String {building}`: Where "building" is any of the campus buildings.
 
@@ -158,15 +160,13 @@ This will return JSON objects with the following structure:
     },
 
 ```
-#### Total Utilization Data
+### Total Utilization Data
 
-TBD
-
+**TBD**
 
 
 Let me know if there is anything that is unclear, or if I can aid in the setup process should you run into any issues. Thanks for reading!
 
-- Daniel
 
 ## Reference Links and Documentation
 
