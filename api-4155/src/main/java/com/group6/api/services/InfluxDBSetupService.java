@@ -1,7 +1,5 @@
 package com.group6.api.services;
 
-import java.util.Scanner;
-
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.InfluxDBIOException;
@@ -18,9 +16,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class InfluxDBSetupService {
 
-	private String databaseURL = "http://192.168.0.1:8086";
-	private String databaseName = "totalConnectedUsers";
+	private String databaseURL = "http://localhost:8086";
+	private String databaseName = "connectedUsersWithBuildingDEV";
 	private InfluxDB connection = InfluxDBFactory.connect(databaseURL, "admin", "admin");
+
 
 	public boolean connectToInfluxDB() {
 
@@ -38,6 +37,7 @@ public class InfluxDBSetupService {
 		this.setConnection(connection);
 		return true;
 	}
+	
 
 	public boolean testInfluxDBConnection(InfluxDB connection) {
 

@@ -11,10 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,13 +45,21 @@ public class InfluxController {
 	private FileService fileService;
 	
 	/*
-	 * DEBUG METHOD
+	 * Return connection data by building
 	 */
-	@GetMapping("/test")
-	private ResponseEntity<String> testAPIConnection() {
-		return new ResponseEntity<String>("success", HttpStatus.OK);
-	
+	@GetMapping("/connectionsByBuilding/b={building}")
+	private ResponseEntity<List<UsersPoint>> getConnectionDataByBuilding(@PathVariable String building) {
+		
+		String query = "SELECT * FROM \"connectionsByBuilding\" WHERE \"Building\" =" + "\'" + building +"\'";
+		List<UsersPoint> data = influxQueryService.processInfluxQuery(query);
+		
+	    if (data == null) {
+			return new ResponseEntity<List<UsersPoint>>(data, HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<List<UsersPoint>>(data, HttpStatus.OK);		
+
 	}
+	
 
 	/*
 	 * Return entire parsed dataset to the front-end.
@@ -61,22 +67,23 @@ public class InfluxController {
 	@GetMapping("/connections")
 	private ResponseEntity<List<UsersPoint>> getListOfConnections() {
 
-		String query = "SELECT * FROM \"Connections\"";
-		List<UsersPoint> usersPointList = influxQueryService.getPoints(influxDBSetupService.getConnection(), query,
-				influxDBSetupService.getDatabaseName());
+		String query = "SELECT * FROM \"connectionsByBuilding\"";
+		List<UsersPoint> data = influxQueryService.processInfluxQuery(query);
 
-		//influxQueryService.setUsersPointList(usersPointList);
-
-		/*if (usersPointList == null) {
-			return new ResponseEntity<List<UsersPoint>>(usersPointList, HttpStatus.BAD_REQUEST);
-		}*/
-		return new ResponseEntity<List<UsersPoint>>(usersPointList, HttpStatus.OK);
+	    if (data == null) {
+			return new ResponseEntity<List<UsersPoint>>(data, HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<List<UsersPoint>>(data, HttpStatus.OK);
 	}
 
 	/*
+	 * DEPRECATED: DO NOT MODIFY OR UNCOMMENT WILL BREAK API
+	 * 
 	 * Inserts a new data point from the front-end (this is a work in progress still
 	 * to translate to Angular).
 	 */
+	
+	/*
 	@PostMapping("/addDataPoint")
 	private ResponseEntity<UsersPoint> addNewDataPoint(@RequestBody UsersPoint newDataPoint) {
 		UsersPoint addedDataPoint = influxQueryService.insertNewDataPoint(influxDBSetupService.getConnection(),
@@ -87,9 +94,11 @@ public class InfluxController {
 		}
 		return new ResponseEntity<UsersPoint>(addedDataPoint, HttpStatus.OK);
 	}
+	*/
 
 	/*
 	 * Tests connection to InfluxDB with a call from the front-end.
+	 * 
 	 */
 	@GetMapping("/testDBConnection")
 	private ResponseEntity<Boolean> testInfluxDBConnection() {
@@ -106,23 +115,14 @@ public class InfluxController {
 		return new ResponseEntity<Boolean>(connected, HttpStatus.OK);
 	}
 
-	/*
-	 * WORK IN PROGRESS, WILL BREAK API DO NOT MODIFY
-	 */
-	@PostMapping("/generateCSV")
-	private ResponseEntity<String> createCSVFromInfluxDB(@RequestBody String pathToCsv) throws IOException {
 
-		if (influxQueryService.getUsersPointList().size() == 0) {
-			return new ResponseEntity<String>("Unable to fetch data! Check database.", HttpStatus.BAD_REQUEST);
-		}
-		return new ResponseEntity<String>(
-				fileService.generateCSVFile(influxQueryService.getUsersPointList(), pathToCsv), HttpStatus.OK);
-	}
-
-	@GetMapping("/downloadCSV")
-	private ResponseEntity<Boolean> exportCSV(HttpServletResponse response)
+	@GetMapping("/downloadCSV/{dataSet}")
+	private ResponseEntity<Boolean> exportCSV(@PathVariable String dataSet, HttpServletResponse response)
 			throws IOException, CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
 
+		String query = influxQueryService.queryConstructor(dataSet);
+		List<UsersPoint> csvList = influxQueryService.processInfluxQuery(query);
+		
 		String filename = "users.csv";
 		response.setContentType("text/csv");
 		response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"");
@@ -130,8 +130,8 @@ public class InfluxController {
 		StatefulBeanToCsv<UsersPoint> writer = new StatefulBeanToCsvBuilder<UsersPoint>(response.getWriter())
 				.withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(CSVWriter.DEFAULT_SEPARATOR)
 				.withOrderedResults(false).build();
-		if (fileService.getUsers() != null) {
-			writer.write(fileService.getUsers());
+		if (fileService.getUsers(csvList) != null) {
+			writer.write(fileService.getUsers(csvList));
 
 		} else {
 			return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);

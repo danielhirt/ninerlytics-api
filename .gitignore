@@ -4,7 +4,7 @@ wifi_sample.txt
 syslog_documentation.pdf
 
 # Visual Studio Code specific ignores
-.vscode/
+/.vscode/
 workspace.code-workspace
 
 # User-specific files
