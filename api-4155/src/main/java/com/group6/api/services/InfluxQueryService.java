@@ -58,11 +58,11 @@ public class InfluxQueryService {
 		if (dataSet.contains("building")) { 
 			
 			dataSet = dataSet.substring(9, 12);
-			query = "SELECT * FROM \"connectionsByBuilding\" WHERE \"Building\" =" + "\'" + dataSet +"\'";
+			query = "SELECT * FROM \"Connections\" WHERE \"Building\" =" + "\'" + dataSet +"\'";
 			
 		} else if (dataSet.equals("all")) {	
 			
-			query = "SELECT * FROM \"connectionsByBuilding\"";
+			query = "SELECT * FROM \"Connections\"";
 		}
 		
 		return query;

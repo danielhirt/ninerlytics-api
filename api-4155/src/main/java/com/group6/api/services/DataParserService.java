@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
  * Service layer logic to handle parsing of data dumps for persistence in InfluxDB instance.
  * @author Matthew Walter, Daniel C. Hirt
  * 
- * @version LOCAL DEVELOPMENT
+ * @version DEPLOYMENT
  */
 @Service
 public class DataParserService extends Thread {
@@ -94,7 +94,7 @@ public class DataParserService extends Thread {
 
         Map<Date, Map<String, ArrayList<String>>> macMap = new HashMap<Date, Map<String, ArrayList<String>>>();
 
-        InfluxDB db = InfluxDBFactory.connect("http://localhost:8086", "admin", "admin");
+        InfluxDB db = InfluxDBFactory.connect("http://69.195.159.150:8086", "admin", "admin");
 
         for (Date date : keys) {
             Map<String, ArrayList<String>> userConnected = new HashMap<String, ArrayList<String>>();
@@ -165,7 +165,7 @@ public class DataParserService extends Thread {
         "Heal", "Unio", "Stu-A", "Coun"};
 
         BatchPoints batchPoints = BatchPoints
-        .database("connectedUsersWithBuildingDEV")
+        .database("connectedUsersWithBuilding")
         .build();
 
         for(Date date : buildingsData.keySet()){
@@ -194,8 +194,8 @@ public class DataParserService extends Thread {
     }
 
     private static void uploadBatchpoints(InfluxDB db, BatchPoints batchPoints){
-        if(!db.databaseExists("connectedUsersWithBuildingDEV")){
-            db.createDatabase("connectedUsersWithBuildingDEV"); 
+        if(!db.databaseExists("connectedUsersWithBuilding")){
+            db.createDatabase("connectedUsersWithBuilding"); 
         }
         db.write(batchPoints);
         
@@ -207,7 +207,7 @@ public class DataParserService extends Thread {
     }
 
     private static BatchPoints createPoint(Date date, int connected, int disconnected, String building, InfluxDB db, BatchPoints batchPoints){
-        Point point = Point.measurement("connectionsByBuilding")
+        Point point = Point.measurement("Connections")
             .time(date.getTime(), TimeUnit.MILLISECONDS)
             .tag("Building", building)
             .addField("Connected", connected)

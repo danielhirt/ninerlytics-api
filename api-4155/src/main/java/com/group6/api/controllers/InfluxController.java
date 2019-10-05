@@ -50,7 +50,7 @@ public class InfluxController {
 	@GetMapping("/connectionsByBuilding/b={building}")
 	private ResponseEntity<List<UsersPoint>> getConnectionDataByBuilding(@PathVariable String building) {
 		
-		String query = "SELECT * FROM \"connectionsByBuilding\" WHERE \"Building\" =" + "\'" + building +"\'";
+		String query = "SELECT * FROM \"Connections\" WHERE \"Building\" =" + "\'" + building +"\'";
 		List<UsersPoint> data = influxQueryService.processInfluxQuery(query);
 		
 	    if (data == null) {
@@ -67,7 +67,7 @@ public class InfluxController {
 	@GetMapping("/connections")
 	private ResponseEntity<List<UsersPoint>> getListOfConnections() {
 
-		String query = "SELECT * FROM \"connectionsByBuilding\"";
+		String query = "SELECT * FROM \"Connections\"";
 		List<UsersPoint> data = influxQueryService.processInfluxQuery(query);
 
 	    if (data == null) {

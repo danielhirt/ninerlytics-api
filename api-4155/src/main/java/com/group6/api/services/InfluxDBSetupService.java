@@ -11,13 +11,15 @@ import org.springframework.stereotype.Service;
  * InfluxDB instance.
  * 
  * @author Daniel C. Hirt
+ * 
+ * @version DEPLOYMENT
  */
 
 @Service
 public class InfluxDBSetupService {
 
-	private String databaseURL = "http://localhost:8086";
-	private String databaseName = "connectedUsersWithBuildingDEV";
+	private String databaseURL = "http://192.168.0.1:8086";
+	private String databaseName = "connectedUsersWithBuilding";
 	private InfluxDB connection = InfluxDBFactory.connect(databaseURL, "admin", "admin");
 
 
@@ -27,14 +29,13 @@ public class InfluxDBSetupService {
 
 			if (!connection.databaseExists(databaseName)) {
 				connection.createDatabase(databaseName);
-				// connection.createRetentionPolicy("defaultPolicy", "totalConnectedUsers",
-				// "30d", 1, true);
 				this.setConnection(connection);
-
-			}
-
-		}
-		this.setConnection(connection);
+			}	
+			this.setConnection(connection);
+			
+		} else {
+			return false;
+		}	
 		return true;
 	}
 	

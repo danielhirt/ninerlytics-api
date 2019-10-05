@@ -11,7 +11,7 @@ import com.opencsv.bean.CsvBindByPosition;
  * POJO/data model representing the "users" measurement persisted to InfluxDB instance. 
  * @author Daniel C. Hirt
  */
-@Measurement(name = "connectionsByBuilding")
+@Measurement(name = "Connections")
 public class UsersPoint {
 
 	@CsvBindByPosition(position = 0)
