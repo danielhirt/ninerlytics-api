@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.group6.api.services.DataParserService;
 import com.group6.api.services.InfluxDBSetupService;
 
+// old state to revert back to
 @SpringBootApplication
 public class SpringAPIHarness {
 
