@@ -23,7 +23,8 @@ import com.group6.api.models.UsersPoint;
 import au.com.bytecode.opencsv.CSVWriter;
 
 /**
- * Service layer logic to perform file upload/download logic and processing. 
+ * Service layer logic to perform file upload/download logic and processing.
+ * 
  * @author Daniel C. Hirt
  */
 @Service
@@ -31,7 +32,7 @@ public class FileService {
 
 	@Autowired
 	private DataParserService dataParserService;
-	
+
 	@SuppressWarnings("unused")
 	@Autowired
 	private InfluxQueryService influxQueryService;
@@ -61,9 +62,9 @@ public class FileService {
 				file.transferTo(saveDestination);
 
 				if (parseFlag.equals("yes")) {
-						dataParserService.generateHashMap(saveDirectory);		
+					dataParserService.generateHashMap(saveDirectory);
 				}
-				message =  "Uploaded file: " + originalName;
+				message = "Uploaded file: " + originalName;
 				return message;
 			}
 
@@ -72,12 +73,12 @@ public class FileService {
 		}
 
 	}
-	
+
 	/*
 	 * WORK IN PROGRESS, WILL BREAK API DO NOT MODIFY
 	 */
 	public String generateCSVFile(List<UsersPoint> usersPointList, String pathToCsv) throws IOException {
-		
+
 		logger.info("User provided path: " + pathToCsv);
 		String message = null;
 		File directory = new File(pathToCsv);
@@ -87,11 +88,11 @@ public class FileService {
 			CSVWriter writer = new CSVWriter(new FileWriter(pathToCsv + "test.csv"));
 			String[] columns = "Name,Time,Connections,Disconnections,ID".split(",");
 			writer.writeNext(columns);
-			
+
 			List<String[]> rows = new LinkedList<String[]>();
-			for (UsersPoint list: usersPointList) {
-				rows.add(new String[]{"users",list.getTime().toString(),list.getBuilding().toString(),list.getConnections().toString(),
-						list.getDisconnections().toString()});		
+			for (UsersPoint list : usersPointList) {
+				rows.add(new String[] { "users", list.getTime().toString(), list.getBuilding().toString(),
+						list.getConnections().toString(), list.getDisconnections().toString() });
 			}
 			writer.writeAll(rows);
 			writer.close();
@@ -99,19 +100,21 @@ public class FileService {
 		} else {
 			message = "Directory cannot be found!";
 		}
-		
+
 		logger.info(message);
 		return message;
 	}
-	
-	
+
 	/*
 	 * Logic to generate a CSV file for use in Jupyter for Carson <3
 	 */
 	public List<UsersPoint> getUsers(List<UsersPoint> csvList) {
+		
+		logger.info("User requesting CSV download of data list with size: " + csvList.size());
 		List<UsersPoint> users = new ArrayList<>();
-		for (UsersPoint list: csvList) {
-			users.add(new UsersPoint(list.getTime(), list.getBuilding(), list.getConnections(), list.getDisconnections()));		
+		for (UsersPoint list : csvList) {
+			users.add(new UsersPoint(list.getTime(), list.getDateAndTime(), list.getBuilding(), list.getConnections(),
+					list.getDisconnections(), list.getLatitude(), list.getLongitude()));
 		}
 		
 		return users;
