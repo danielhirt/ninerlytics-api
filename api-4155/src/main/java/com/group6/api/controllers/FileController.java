@@ -30,8 +30,7 @@ public class FileController {
 			return new ResponseEntity<String>(response, HttpStatus.BAD_REQUEST);
 		} else {
 			response = fileService.processFile(file, parseFlag);
-		}
-		
+		}	
 		return new ResponseEntity<String>(response, HttpStatus.OK);
 	}
 	

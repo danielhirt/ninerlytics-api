@@ -16,11 +16,11 @@ import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
@@ -33,9 +33,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class DataParserService extends Thread {
 	
-	@Autowired
-	InfluxDBSetupService influxDBService;
-
 
     // Get all the files in any given folder
     public void findFiles() {
@@ -55,7 +52,9 @@ public class DataParserService extends Thread {
                 System.out.println("File " + listOfFiles[i].getName() + " Length of Files " + listOfFiles.length);
                 generateHashMap(pathToFolder.toString() + "/" + listOfFiles[i].getName());
             }
+            
         }
+        
     }
 
 
