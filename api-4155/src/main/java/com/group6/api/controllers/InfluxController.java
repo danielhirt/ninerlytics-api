@@ -43,27 +43,23 @@ public class InfluxController {
 
 	@Autowired
 	private FileService fileService;
-
+	
 	/*
 	 * Return connection data by building
 	 */
 	@GetMapping("/connectionsByBuilding/b={building}")
 	private ResponseEntity<List<UsersPoint>> getConnectionDataByBuilding(@PathVariable String building) {
-
-		List<UsersPoint> data = influxQueryService.queryConstructor(building);
-
-		if (data == null) {
-
 		
 		String query = "SELECT * FROM \"Connections\" WHERE \"Building\" =" + "\'" + building +"\'";
 		List<UsersPoint> data = influxQueryService.processInfluxQuery(query);
 		
 	    if (data == null) {
-
 			return new ResponseEntity<List<UsersPoint>>(data, HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity<List<UsersPoint>>(data, HttpStatus.OK);
+		return new ResponseEntity<List<UsersPoint>>(data, HttpStatus.OK);		
+
 	}
+	
 
 	/*
 	 * Return entire parsed dataset to the front-end.
@@ -71,21 +67,38 @@ public class InfluxController {
 	@GetMapping("/connections")
 	private ResponseEntity<List<UsersPoint>> getListOfConnections() {
 
-
-		List<UsersPoint> data = influxQueryService.queryConstructor(new String("all"));
-
 		String query = "SELECT * FROM \"Connections\"";
 		List<UsersPoint> data = influxQueryService.processInfluxQuery(query);
 
-
-		if (data == null) {
+	    if (data == null) {
 			return new ResponseEntity<List<UsersPoint>>(data, HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity<List<UsersPoint>>(data, HttpStatus.OK);
 	}
 
 	/*
+	 * DEPRECATED: DO NOT MODIFY OR UNCOMMENT WILL BREAK API
+	 * 
+	 * Inserts a new data point from the front-end (this is a work in progress still
+	 * to translate to Angular).
+	 */
+	
+	/*
+	@PostMapping("/addDataPoint")
+	private ResponseEntity<UsersPoint> addNewDataPoint(@RequestBody UsersPoint newDataPoint) {
+		UsersPoint addedDataPoint = influxQueryService.insertNewDataPoint(influxDBSetupService.getConnection(),
+				influxDBSetupService.getDatabaseName(), newDataPoint);
+
+		if (addedDataPoint == null) {
+			return new ResponseEntity<UsersPoint>(addedDataPoint, HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<UsersPoint>(addedDataPoint, HttpStatus.OK);
+	}
+	*/
+
+	/*
 	 * Tests connection to InfluxDB with a call from the front-end.
+	 * 
 	 */
 	@GetMapping("/testDBConnection")
 	private ResponseEntity<Boolean> testInfluxDBConnection() {
@@ -102,16 +115,14 @@ public class InfluxController {
 		return new ResponseEntity<Boolean>(connected, HttpStatus.OK);
 	}
 
-	/*
-	 * Generates a CSV for download based on a specified set of data recieved from
-	 * the client
-	 */
+
 	@GetMapping("/downloadCSV/{dataSet}")
 	private ResponseEntity<Boolean> exportCSV(@PathVariable String dataSet, HttpServletResponse response)
 			throws IOException, CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
 
-		boolean downloadSuccess = false;
-		List<UsersPoint> csvList = influxQueryService.queryConstructor(dataSet);
+		String query = influxQueryService.queryConstructor(dataSet);
+		List<UsersPoint> csvList = influxQueryService.processInfluxQuery(query);
+		
 		String filename = "users.csv";
 		response.setContentType("text/csv");
 		response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"");
@@ -121,12 +132,11 @@ public class InfluxController {
 				.withOrderedResults(false).build();
 		if (fileService.getUsers(csvList) != null) {
 			writer.write(fileService.getUsers(csvList));
-			downloadSuccess = true;
+
 		} else {
-			downloadSuccess = false;
-			return new ResponseEntity<Boolean>(downloadSuccess, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity<Boolean>(downloadSuccess, HttpStatus.OK);
+		return new ResponseEntity<Boolean>(true, HttpStatus.OK);
 	}
 
 }
