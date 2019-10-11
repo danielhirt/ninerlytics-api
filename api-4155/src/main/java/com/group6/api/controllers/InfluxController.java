@@ -53,6 +53,13 @@ public class InfluxController {
 		List<UsersPoint> data = influxQueryService.queryConstructor(building);
 
 		if (data == null) {
+
+		
+		String query = "SELECT * FROM \"Connections\" WHERE \"Building\" =" + "\'" + building +"\'";
+		List<UsersPoint> data = influxQueryService.processInfluxQuery(query);
+		
+	    if (data == null) {
+
 			return new ResponseEntity<List<UsersPoint>>(data, HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity<List<UsersPoint>>(data, HttpStatus.OK);
@@ -64,7 +71,12 @@ public class InfluxController {
 	@GetMapping("/connections")
 	private ResponseEntity<List<UsersPoint>> getListOfConnections() {
 
+
 		List<UsersPoint> data = influxQueryService.queryConstructor(new String("all"));
+
+		String query = "SELECT * FROM \"Connections\"";
+		List<UsersPoint> data = influxQueryService.processInfluxQuery(query);
+
 
 		if (data == null) {
 			return new ResponseEntity<List<UsersPoint>>(data, HttpStatus.BAD_REQUEST);

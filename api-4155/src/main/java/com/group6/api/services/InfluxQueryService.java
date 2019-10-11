@@ -80,6 +80,29 @@ public class InfluxQueryService extends Constants {
 
 		logger.info("Size of processed query to be returned: " + list.size());
 		return list;
+
+	}
+	
+	/*
+	 * Method to construct queries for use when generating CSVs of data from the front-end
+	 */	
+	public String queryConstructor(String dataSet) {
+		
+		String query = null;
+		
+		// parameter from front-end following format example "building-Atki"
+		if (dataSet.contains("building")) { 
+			
+			dataSet = dataSet.substring(9, 12);
+			query = "SELECT * FROM \"Connections\" WHERE \"Building\" =" + "\'" + dataSet +"\'";
+			
+		} else if (dataSet.equals("all")) {	
+			
+			query = "SELECT * FROM \"Connections\"";
+		}
+		
+		return query;
+
 	}
 
 	/**

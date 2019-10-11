@@ -1,5 +1,6 @@
 package com.group6.api;
 
+
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -7,6 +8,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.group6.api.services.DataParserService;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 import com.group6.api.services.InfluxDBSetupService;
 
 @SpringBootApplication
@@ -14,6 +18,7 @@ public class SpringAPIHarness {
 
 	public static void main(String[] args) throws InterruptedException {
 		SpringApplication.run(SpringAPIHarness.class, args);
+
 
 		System.out.println("");
 		System.out.println(
@@ -59,10 +64,19 @@ public class SpringAPIHarness {
 
 			} while (!validInput);
 
+
+
+		InfluxDBSetupService influxDBSetupService = new InfluxDBSetupService();
+		
+		if(influxDBSetupService.connectToInfluxDB()) {
+			System.out.println("CONNECTION SUCCESS");
+
 		} else {
-			scanner.close();
-			return;
+			System.out.println("ERROR WITH CONNECTION");
 		}
+
+		
+	
 
 	}
 
