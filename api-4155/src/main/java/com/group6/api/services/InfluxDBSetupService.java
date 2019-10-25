@@ -27,8 +27,8 @@ import com.group6.api.models.UsersPoint;
 @Service
 public class InfluxDBSetupService {
 
-	private String databaseURL = "http://69.195.159.150:8086";
-	private String databaseName = "deployDB";
+	private String databaseURL = "http://localhost:8086";
+	private String databaseName = "developmentDB";
 	private InfluxDB connection = InfluxDBFactory.connect(databaseURL, "admin", "admin");
 	private static final Logger logger = Logger.getLogger(InfluxDBSetupService.class.getName());
 	private static final DateFormat formatter = new SimpleDateFormat("yyyy MMM dd HH:mm");

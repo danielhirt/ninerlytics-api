@@ -89,7 +89,7 @@ public class DataParserService extends Thread {
 
         Map<Date, Map<String, ArrayList<String>>> macMap = new HashMap<Date, Map<String, ArrayList<String>>>();
 
-        InfluxDB db = InfluxDBFactory.connect("http://69.195.159.150:8086", "admin", "admin");
+        InfluxDB db = InfluxDBFactory.connect("http://localhost:8086", "admin", "admin");
 
         String[] sysIPs = {"10.47.128.140", "10.47.0.22", "10.47.0.23", "10.47.0.32", "10.47.0.33"};
 
@@ -162,7 +162,7 @@ public class DataParserService extends Thread {
         "Heal", "Unio", "Stu-A", "Coun"};
 
         BatchPoints batchPoints = BatchPoints
-        .database("deployDB")
+        .database("developmentDB")
         .build();
         
         for(Date date : buildingsData.keySet()){
@@ -190,8 +190,8 @@ public class DataParserService extends Thread {
     }
 
     private static void uploadBatchpoints(InfluxDB db, BatchPoints batchPoints){
-        if(!db.databaseExists("deployDB")){
-            db.createDatabase("deployDB"); 
+        if(!db.databaseExists("developmentDB")){
+            db.createDatabase("developmentDB"); 
         }
         db.write(batchPoints);
         
