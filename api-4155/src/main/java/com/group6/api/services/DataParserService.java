@@ -54,7 +54,6 @@ public class DataParserService extends Thread {
         
     }
 
-
     public void generateHashMap(String pathToFile) {
     	
         try {
@@ -89,7 +88,7 @@ public class DataParserService extends Thread {
 
         Map<Date, Map<String, ArrayList<String>>> macMap = new HashMap<Date, Map<String, ArrayList<String>>>();
 
-        InfluxDB db = InfluxDBFactory.connect("http://localhost:8086", "admin", "admin");
+        InfluxDB db = InfluxDBFactory.connect("http://69.195.159.150:8086", "admin", "admin");
 
         String[] sysIPs = {"10.47.128.140", "10.47.0.22", "10.47.0.23", "10.47.0.32", "10.47.0.33"};
 
@@ -124,7 +123,7 @@ public class DataParserService extends Thread {
     private void mapBuildings(Map<Date, Map<String, ArrayList<String>>> macMap, InfluxDB db){
         String[] buildings = {"Atki", "Barn", "Bioi", "Came", "CoEd", "Colv", "Cone", "Duke", "EPIC", "Faci", "FOPS", "Foun", "Fret", "Gade", "Grig", "Kenn", "King", "Laur", "Levi", 
         "Lync", "Macy", "McMi", "Memo", "PORT", "Pros", "Robi", "Rowe", "Smit", "Stor", "StuU", "With", "Winn", "Wood", "HunH", "BelH", "CenC", "SVDH", "Tenn", "Harr", "RUP", "BandCor2", "StuH", 
-        "Heal", "Unio", "Stu-A", "Coun"};
+        "Heal", "Unio", "Stu-A", "Coun", "Irwi", "BelG", "McEn", "Frid", "Denn", "StuA", "Rece", "Rees", "Cato", "NCRC", "McCo", "Mart", "Auxi", "Gari", "Pros", "Cafe", "Burs"};
         
         Map<Date, ArrayList<String>> buildingsData = new HashMap<Date, ArrayList<String>>();
         try {
@@ -135,14 +134,11 @@ public class DataParserService extends Thread {
                     for(String data : datas){
                         String building = Arrays.stream(buildings).parallel().filter(data::contains).findAny().toString();
                         String buildName = building.substring(9, building.length() - 1);
-                        if(buildName == "empt"){
-                            buildName = "UNKNOWN";
-                        }
                         if(data.contains("Assoc success")){
-                            formattedDatas.add(mac + "-Joined-" + buildName);
+                            formattedDatas.add(mac + "+" + buildName);
                         }
                         else if (data.contains("Deauth")){
-                            formattedDatas.add(mac + "-Left-" + buildName);
+                            formattedDatas.add(mac + "-" + buildName);
                         }
                     }
                 }
@@ -159,10 +155,15 @@ public class DataParserService extends Thread {
     private void putDataIntoInflux(Map<Date, ArrayList<String>> buildingsData, InfluxDB db){
         String[] buildings = {"Atki", "Barn", "Bioi", "Came", "CoEd", "Colv", "Cone", "Duke", "EPIC", "Faci", "FOPS", "Foun", "Fret", "Gade", "Grig", "Kenn", "King", "Laur", "Levi", 
         "Lync", "Macy", "McMi", "Memo", "PORT", "Pros", "Robi", "Rowe", "Smit", "Stor", "StuU", "With", "Winn", "Wood", "HunH", "BelH", "CenC", "SVDH", "Tenn", "Harr", "RUP", "BandCor2", "StuH", 
-        "Heal", "Unio", "Stu-A", "Coun"};
+        "Heal", "Unio", "Stu-A", "Coun", "Irwi", "BelG", "McEn", "Frid", "Denn", "StuA", "Rece", "Rees", "Cato", "NCRC", "McCo", "Mart", "Auxi", "Gari", "Pros", "Cafe", "Burs"};
+        
 
-        BatchPoints batchPoints = BatchPoints
-        .database("developmentDB")
+        BatchPoints aggregateBatchPoints = BatchPoints
+        .database("test-connDB")
+        .build();
+
+        BatchPoints macBatchPoints = BatchPoints
+        .database("test-macDB")
         .build();
         
         for(Date date : buildingsData.keySet()){
@@ -171,8 +172,8 @@ public class DataParserService extends Thread {
             for(String building : buildings){
                 int connects = 0;
                 int disconnects = 0;
-                String connectedString = "Joined-"+ building;
-                String disconnectedString = "Left-"+ building;
+                String connectedString = "+"+ building;
+                String disconnectedString = "-"+ building;
                 for(String data : array){
                     if(data.contains(disconnectedString)){
                         disconnects++;
@@ -180,18 +181,38 @@ public class DataParserService extends Thread {
                     else if (data.contains(connectedString)){
                         connects++;
                     }
+                    macBatchPoints = createMacPoints(date, data, building, db, macBatchPoints);
                 }
                 // DEPRECATED: int connected = connects - disconnects;
-                batchPoints = createPoint(date, connects, disconnects, building, db, batchPoints);
+                aggregateBatchPoints = createAggregatePoint(date, connects, disconnects, building, db, aggregateBatchPoints);
             }
             
         }
-        uploadBatchpoints(db, batchPoints);
+        uploadBatchpoints(db, aggregateBatchPoints);
+        uploadBatchpoints(db, macBatchPoints);
+    }
+
+    private static BatchPoints createMacPoints(Date date, String data, String building, InfluxDB db, BatchPoints batchPoints){
+        String action = "";
+        if(data.substring(41, 42).equals("+")){
+            action = "Joined";
+        } else {
+            action = "Left";
+        }
+        Point point = Point.measurement(data.substring(0, 41))
+        .time(date.getTime(), TimeUnit.MILLISECONDS)
+        .tag("Building", building)
+        .addField("action", action)
+        .build();
+
+        batchPoints.point(point);
+
+        return batchPoints;
     }
 
     private static void uploadBatchpoints(InfluxDB db, BatchPoints batchPoints){
-        if(!db.databaseExists("developmentDB")){
-            db.createDatabase("developmentDB"); 
+        if(!db.databaseExists("deployDB")){
+            db.createDatabase("deployDB"); 
         }
         db.write(batchPoints);
         
@@ -202,7 +223,7 @@ public class DataParserService extends Thread {
         
     }
 
-    private static BatchPoints createPoint(Date date, int connected, int disconnected, String building, InfluxDB db, BatchPoints batchPoints){
+    private static BatchPoints createAggregatePoint(Date date, int connected, int disconnected, String building, InfluxDB db, BatchPoints batchPoints){
         Point point = Point.measurement("connectionsByBuilding")
             .time(date.getTime(), TimeUnit.MILLISECONDS)
             .tag("Building", building)
