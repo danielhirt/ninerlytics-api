@@ -54,24 +54,21 @@ public class DataParserService extends Thread {
         
     }
 
-    public void generateHashMap(String pathToFile) {
-    	
+    public void generateHashMap(String pathToFile) { 	
         try {
             Map<Date, ArrayList<String>> mapOfTimes = new HashMap<Date, ArrayList<String>>();
 
             BufferedReader br = new BufferedReader(new FileReader(pathToFile));
 
             String line = br.readLine();
-
-            //DateFormat format = new DateTimeFormatter("yyyy-MM-ddTHH:mm");
             while (line != null) {
                 Date key = Date.from(Instant.parse(line.subSequence(0, 25)));
                 if (mapOfTimes.containsKey(key)) {
                     mapOfTimes.get(key).add(line.substring(17));
                 } else {
-                    ArrayList<String> stringList = new ArrayList<String>();
-                    stringList.add(line.substring(26));
-                    mapOfTimes.put(key, stringList);
+                    ArrayList<String> temp = new ArrayList<String>();
+                    temp.add(line.substring(26));
+                    mapOfTimes.put(key, temp);
                 }
                 line = br.readLine();
             }
@@ -211,8 +208,8 @@ public class DataParserService extends Thread {
     }
 
     private static void uploadBatchpoints(InfluxDB db, BatchPoints batchPoints){
-        if(!db.databaseExists("deployDB")){
-            db.createDatabase("deployDB"); 
+        if(!db.databaseExists(batchPoints.getDatabase())){
+            db.createDatabase(batchPoints.getDatabase()); 
         }
         db.write(batchPoints);
         
@@ -232,7 +229,7 @@ public class DataParserService extends Thread {
             .build();
 
         batchPoints.point(point);
-        System.out.println("Batchpoint Written: " + point.toString());
+        //System.out.println("Batchpoint Written: " + point.toString());
         return batchPoints;
     }
 }
