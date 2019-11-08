@@ -50,7 +50,6 @@ public class generateMacTrackJSON {
             measurements.add(passedInMeasurement);
         } else {
             measurements = getMeasurements(db);
-            
         }
         JsonObject finalJson = new JsonObject();
         for(int i =0; i < measurements.size(); i++){
@@ -80,7 +79,10 @@ public class generateMacTrackJSON {
         String queryReturn = db.query(getMeasurement).getResults().toString();
         queryReturn = queryReturn.replace("[Result [series=[Series [name=" + measurement + ", tags=null, columns=[time, Building, action], values=[", "");
         queryReturn = queryReturn.replace("]]], error=null]]", "");
-        System.out.println(queryReturn);
+        String[] queryReturnArray = queryReturn.split(",");
+        for(int i = 0; i < queryReturnArray.length; i++){
+            System.out.println(queryReturnArray[i]);
+        }
         return new JsonObject();
     }
 }
