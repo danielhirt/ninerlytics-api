@@ -42,7 +42,7 @@ public class Parser {
 		Scanner scanner = new Scanner(System.in);
         System.out.println("Please Enter Data Dump Folder Location:");
 
-        String pathToFolder = "C:/Users/Atom2/Documents/Repo";//scanner.nextLine();
+        String pathToFolder = scanner.nextLine();
 
 
         File folder = new File(pathToFolder.toString());
@@ -104,7 +104,7 @@ public class Parser {
                     // Check for Matches in data
                     Matcher mat = pat.matcher(data);
                     if (mat.find()) { // If there is a Mac Address Found
-                        String mac = mat.group().substring(1, 42);
+                        String mac = mat.group().substring(1, 42).trim();
                         if(userConnected.keySet().contains(mac)){
                             ArrayList<String> str = userConnected.get(mac);
                             str.add(data);
@@ -202,7 +202,7 @@ public class Parser {
         } else {
             action = "Left";
         }
-        Point point = Point.measurement(data.substring(0, 41))
+        Point point = Point.measurement(data.substring(0, 40))
         .time(date.getTime(), TimeUnit.MILLISECONDS)
         .tag("Building", building)
         .addField("action", action)

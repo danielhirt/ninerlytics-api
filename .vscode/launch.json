@@ -2,6 +2,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - generateMacTrackJSON",
+            "request": "launch",
+            "mainClass": "com.thatgroup.generateMacTrackJSON",
+            "projectName": "campusheatmap"
+        },
+        {
+            "type": "java",
             "name": "CodeLens (Launch) - Parser",
             "request": "launch",
             "mainClass": "com.thatgroup.Parser",
