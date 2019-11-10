@@ -53,9 +53,9 @@ public class generateMacTrackJSON {
         }
         JsonObject finalJson = new JsonObject();
         for(int i =0; i < measurements.size(); i++){
-            createJSON(db, measurements.get(i), start, end).toString();
-            //finalJson.addProperty(measurements.get(i), createJSON(db, measurements.get(i)).toString());
+            finalJson.add(measurements.get(i), createJSON(db, measurements.get(i), start, end));
         }
+        System.out.println(finalJson.toString());
     }
 
     private ArrayList<String> getMeasurements(InfluxDB db){
@@ -74,15 +74,18 @@ public class generateMacTrackJSON {
     }
 
     private JsonObject createJSON(InfluxDB db, String measurement, Date startDate, Date endDate){
+        JsonObject returnJson = new JsonObject();
         String newQuery = "SELECT * FROM \"" + measurement + "\" WHERE time > \'" + startDate.toInstant() + "\' AND time < \'" + endDate.toInstant() + "\'";
         Query getMeasurement = new Query(newQuery, "test-macDB");
         String queryReturn = db.query(getMeasurement).getResults().toString();
         queryReturn = queryReturn.replace("[Result [series=[Series [name=" + measurement + ", tags=null, columns=[time, Building, action], values=[", "");
         queryReturn = queryReturn.replace("]]], error=null]]", "");
-        String[] queryReturnArray = queryReturn.split(",");
+        String[] queryReturnArray = queryReturn.split("],");
         for(int i = 0; i < queryReturnArray.length; i++){
-            System.out.println(queryReturnArray[i]);
+            if(!queryReturnArray[i].contains("[Result [series=null, error=null]]")){
+                returnJson.addProperty(queryReturnArray[i].split(",")[0].replace("[", "").replaceAll("\"", ""), queryReturnArray[i].split(",")[2].replace("]", "").trim() + " " + queryReturnArray[i].split(",")[1].trim());
+            }
         }
-        return new JsonObject();
+        return returnJson;
     }
 }
