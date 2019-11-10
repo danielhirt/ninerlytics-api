@@ -53,7 +53,10 @@ public class generateMacTrackJSON {
         }
         JsonObject finalJson = new JsonObject();
         for(int i =0; i < measurements.size(); i++){
-            finalJson.add(measurements.get(i), createJSON(db, measurements.get(i), start, end));
+            JsonObject jsonReturn = createJSON(db, measurements.get(i), start, end);
+            if(jsonReturn != null){
+                finalJson.add(measurements.get(i), jsonReturn);
+            }
         }
         System.out.println(finalJson.toString());
     }
@@ -84,6 +87,8 @@ public class generateMacTrackJSON {
         for(int i = 0; i < queryReturnArray.length; i++){
             if(!queryReturnArray[i].contains("[Result [series=null, error=null]]")){
                 returnJson.addProperty(queryReturnArray[i].split(",")[0].replace("[", "").replaceAll("\"", ""), queryReturnArray[i].split(",")[2].replace("]", "").trim() + " " + queryReturnArray[i].split(",")[1].trim());
+            } else {
+                returnJson = null;
             }
         }
         return returnJson;
