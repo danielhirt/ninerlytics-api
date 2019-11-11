@@ -23,22 +23,16 @@ public class MacTrackingService {
 
 	private static final Logger logger = Logger.getLogger(MacTrackingService.class.getName());
 
-	public JsonObject generateMacAddressJSON(String startDate, String endDate) {
+	public String generateMacAddressJSON(String startDate, String endDate) {
 		//InfluxDB db = influxDBSetupService.getConnection();
 		
-		InfluxDB db = InfluxDBFactory.connect("http://localhost:8086", "admin", "admin");
-		
-		logger.info("Start date: " + startDate);
-		logger.info("End date: " + endDate);
-
+		InfluxDB db = InfluxDBFactory.connect("http://69.195.159.150:8086/", "admin", "admin");
+	
 		ArrayList<String> measurements = new ArrayList<String>();
 		StringBuilder multipleMeasurements = new StringBuilder(); // Init string of measurements for query
 
 		Date start = Date.from(Instant.parse(startDate)); // "2019-10-10T15:17:01-04:00"));
 		Date end = Date.from(Instant.parse(endDate)); // "2019-10-10T15:17:03-04:00"));
-		
-		logger.info("Start date after parse: " + start);
-		logger.info("End date after parse: " + end);
 
 		logger.info("Starting execution for " + startDate + " to " + endDate + ":");
 		measurements = getMeasurements(db);
@@ -52,13 +46,13 @@ public class MacTrackingService {
 			}
 		}
 
-		return createFinalJSON(db, multipleMeasurements.toString(), start, end);
+		return createFinalJSON(db, multipleMeasurements.toString(), start, end).toString();
 
 	}
 
 	private ArrayList<String> getMeasurements(InfluxDB db) {
 		// Create query and query DB
-		Query getMeasurements = new Query("SHOW MEASUREMENTS", "developmentDBMacs");
+		Query getMeasurements = new Query("SHOW MEASUREMENTS", "test-macDB");
 		String queryReturn = db.query(getMeasurements).getResults().toString();
 
 		// Clean return up
@@ -86,15 +80,9 @@ public class MacTrackingService {
 		// Create query and then query DB
 		String newQuery = "SELECT * FROM " + measurement + " WHERE time > \'" + startDate.toInstant()
 				+ "\' AND time < \'" + endDate.toInstant() + "\'";
-		
-		logger.info("newQuery: " + newQuery);
-		
-		Query getMeasurement = new Query(newQuery, "developmentDBMacs");
-		logger.info("QUERY NO LIST: " +  db.query(getMeasurement));
-		
+		Query getMeasurement = new Query(newQuery, "test-macDB");
 		List<QueryResult.Series> queryReturn = db.query(getMeasurement).getResults().get(0).getSeries();
 	
-
 		// Iterate through all returns to create each json element
 		for (int i = 0; i < queryReturn.size(); i++) { // NULL HERE
 			finalJSON.add(queryReturn.get(i).getName(), createIndividualJSON(queryReturn.get(i), startDate, endDate));

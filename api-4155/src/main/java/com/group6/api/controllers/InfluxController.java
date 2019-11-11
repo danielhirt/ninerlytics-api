@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.gson.JsonObject;
 import com.group6.api.models.UsersPoint;
 import com.group6.api.services.FileService;
 import com.group6.api.services.InfluxDBSetupService;
@@ -100,14 +99,14 @@ public class InfluxController {
 	 * information based on a range of dates. 
 	 */
 	@GetMapping("/generateMacData/s={startDate}/e={endDate}") 
-	private ResponseEntity<JsonObject> getMacTrackingJSON(@PathVariable String startDate, @PathVariable String endDate) { 
+	private ResponseEntity<String> getMacTrackingJSON(@PathVariable String startDate, @PathVariable String endDate) { 
 		
-		JsonObject data = macTrackingService.generateMacAddressJSON(startDate, endDate);
+		String data = macTrackingService.generateMacAddressJSON(startDate, endDate);
 		
 		if (data == null) {
-			return new ResponseEntity<JsonObject>(data, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<String>(data, HttpStatus.BAD_REQUEST);
 		}	
-		return new ResponseEntity<JsonObject>(data, HttpStatus.OK);
+		return new ResponseEntity<String>(data, HttpStatus.OK);
 	}
 
 	/*
