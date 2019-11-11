@@ -2,6 +2,7 @@ package com.group6.api.services;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -28,11 +29,12 @@ import com.group6.api.models.UsersPoint;
 public class InfluxDBSetupService {
 
 	private String databaseURL = "http://localhost:8086";
-	private String databaseName = "developmentDB";
+	private String databaseName = "developmentDBConnections";
+	private String databaseNameMACs = "developmentDBMacs";
 	private InfluxDB connection = InfluxDBFactory.connect(databaseURL, "admin", "admin");
 	private static final Logger logger = Logger.getLogger(InfluxDBSetupService.class.getName());
 	private static final DateFormat formatter = new SimpleDateFormat("yyyy MMM dd HH:mm");
-	
+
 	/**
 	 * Checks InfluxDB connection
 	 * 
@@ -40,15 +42,20 @@ public class InfluxDBSetupService {
 	 */
 	public boolean connectToInfluxDB() {
 
+		ArrayList<String> databaseReferences = new ArrayList<String>();
+		databaseReferences.add(databaseName);
+		databaseReferences.add(databaseNameMACs);
+
 		if (this.testInfluxDBConnection(connection)) {
 
-			if (!connection.databaseExists(databaseName)) {
-				connection.createDatabase(databaseName);		
-			}				
-		}	
+			for (String db : databaseReferences) {
+				if (!connection.databaseExists(db)) {
+					connection.createDatabase(db);
+				}
+			}
+		}
 		return true;
 	}
-	
 
 	public boolean testInfluxDBConnection(InfluxDB connection) {
 
@@ -71,7 +78,7 @@ public class InfluxDBSetupService {
 		}
 
 	}
-	
+
 	/**
 	 * Method to process InfluxDB data queries, overriding REST controllers
 	 * 
@@ -80,16 +87,16 @@ public class InfluxDBSetupService {
 	 */
 	public List<UsersPoint> processDatabase(String query) {
 		logger.info("Query recieved to be executed: " + query);
-		
-		QueryResult queryResult = connection.query(new Query(query, databaseName));	
+
+		QueryResult queryResult = connection.query(new Query(query, databaseName));
 		InfluxDBResultMapper resultMapper = new InfluxDBResultMapper();
-		List<UsersPoint> list = resultMapper.toPOJO(queryResult, UsersPoint.class);	
+		List<UsersPoint> list = resultMapper.toPOJO(queryResult, UsersPoint.class);
 		for (UsersPoint obj : list) {
 			Date dateFormat = Date.from(obj.getTime());
 			String formattedDate = formatter.format(dateFormat);
-			obj.setDateAndTime(formattedDate);			
-		}			
-		return list;		
+			obj.setDateAndTime(formattedDate);
+		}
+		return list;
 	}
 
 	public InfluxDB getConnection() {
@@ -115,6 +122,13 @@ public class InfluxDBSetupService {
 	public void setDatabaseName(String databaseName) {
 		this.databaseName = databaseName;
 	}
-	
+
+	public String getDatabaseNameMACs() {
+		return databaseNameMACs;
+	}
+
+	public void setDatabaseNameMACs(String databaseNameMACs) {
+		this.databaseNameMACs = databaseNameMACs;
+	}
 
 }

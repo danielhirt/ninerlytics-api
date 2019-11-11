@@ -16,10 +16,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.gson.JsonObject;
 import com.group6.api.models.UsersPoint;
 import com.group6.api.services.FileService;
 import com.group6.api.services.InfluxDBSetupService;
 import com.group6.api.services.InfluxQueryService;
+import com.group6.api.services.MacTrackingService;
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
@@ -43,6 +45,9 @@ public class InfluxController {
 
 	@Autowired
 	private FileService fileService;
+	
+	@Autowired
+	private MacTrackingService macTrackingService;
 
 	/*
 	 * Return connection data by building
@@ -88,6 +93,21 @@ public class InfluxController {
 			return new ResponseEntity<Boolean>(connected, HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity<Boolean>(connected, HttpStatus.OK);
+	}
+	
+	/*
+	 * Utilizes MacTrackingService.java to build a JsonObject of MAC address
+	 * information based on a range of dates. 
+	 */
+	@GetMapping("/generateMacData/s={startDate}/e={endDate}") 
+	private ResponseEntity<JsonObject> getMacTrackingJSON(@PathVariable String startDate, @PathVariable String endDate) { 
+		
+		JsonObject data = macTrackingService.generateMacAddressJSON(startDate, endDate);
+		
+		if (data == null) {
+			return new ResponseEntity<JsonObject>(data, HttpStatus.BAD_REQUEST);
+		}	
+		return new ResponseEntity<JsonObject>(data, HttpStatus.OK);
 	}
 
 	/*

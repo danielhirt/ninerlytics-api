@@ -64,8 +64,8 @@ public class InfluxQueryService extends Constants {
 			Date dateFormat = Date.from(obj.getTime());
 			String formattedDate = formatter.format(dateFormat);
 			obj.setDateAndTime(formattedDate);
-
 			Iterator<Entry<String, ArrayList<Double>>> itr = set.iterator();
+			
 			while (itr.hasNext()) {
 				Map.Entry<String, ArrayList<Double>> entry = itr.next();
 
@@ -73,11 +73,9 @@ public class InfluxQueryService extends Constants {
 
 					obj.setLatitude(entry.getValue().get(0));
 					obj.setLongitude(entry.getValue().get(1));
-
 				}
 			}
 		}
-
 		logger.info("Size of processed query to be returned: " + list.size());
 		return list;
 	}
