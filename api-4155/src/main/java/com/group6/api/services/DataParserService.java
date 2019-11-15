@@ -191,7 +191,7 @@ public class DataParserService extends Thread {
 
     private static BatchPoints createMacPoints(Date date, String data, String building, InfluxDB db, BatchPoints batchPoints){
         String action = "";
-        if(data.substring(41, 42).equals("+")){
+        if(data.substring(40, 41).equals("+")){
             action = "Joined";
         } else {
             action = "Left";
