@@ -22,7 +22,7 @@ public class SpringAPIHarness {
 		influxDBSetupService.connectToInfluxDB();
 		profileService.initializeRoles();
 
-		System.out.println("Would you like to parse new data?");
+		/*System.out.println("Would you like to parse new data?");
 
 		Scanner input = new Scanner(System.in);
 		String response = input.nextLine();
@@ -34,7 +34,7 @@ public class SpringAPIHarness {
 			input.close();
 			System.out.println("API initialized and listening on port 8080" + "\n"
 					+ "Spring Framework Version: 2.1.8-RELEASE" + "\n" + "Java Version: 1.8");
-		}
+		}*/
 
 	}
 }

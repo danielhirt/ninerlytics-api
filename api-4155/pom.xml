@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.group6</groupId>
 	<artifactId>api-4155</artifactId>
-	<version>1.0.2-SPRT-1</version>
+	<version>1.0.4-SPRT-2</version>
 	<name>api-4155</name>
 	<description>API for interfacing with InfluxDB</description>
 

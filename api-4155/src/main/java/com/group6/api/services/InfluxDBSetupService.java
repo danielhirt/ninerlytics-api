@@ -28,8 +28,8 @@ import com.group6.api.models.UsersPoint;
 @Service
 public class InfluxDBSetupService {
 
-	private String databaseURL = "http://localhost:8086";
-	private String databaseName = "developmentDBConnections";
+	private String databaseURL = "http://69.195.159.150:8086/";
+	private String databaseName = "test-connDB";
 	private String databaseNameMACs = "developmentDBMacs";
 	private InfluxDB connection = InfluxDBFactory.connect(databaseURL, "admin", "admin");
 	private static final Logger logger = Logger.getLogger(InfluxDBSetupService.class.getName());
