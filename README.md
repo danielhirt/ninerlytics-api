@@ -5,9 +5,9 @@ Documentation Author: Daniel Hirt, dhirt@uncc.edu
 
 ## Initial Setup & Dependencies
 
-API Development Version: **v1.0.2-SPRT-1**
+API Development Version: **v1.0.4-SPRT-3**
 
-API Deployment Version:  **v1.0.2-SPRT-1-PROD**
+API Deployment Version:  **v1.0.4-SPRT-3-PROD**
 
 Note: "campusheatmap" is **DEPRECATED**
 
@@ -185,8 +185,6 @@ Let me know if there is anything that is unclear, or if I can aid in the setup p
 * Austin Young: UI/UX Development, Front-end Development	
 * Abhinav Kasu: Back-end Development
 * Matthew Walter: Back-end Development
-* Aaron Yow: Back-end Development
-* Andre Raposo: Back-end Development
 * Seth Frady: Front-end Development			
 * Aasim Munshi: Front-end Development				
 * Matthew Shangle: Front-end Development			

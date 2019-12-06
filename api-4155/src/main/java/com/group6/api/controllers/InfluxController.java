@@ -20,6 +20,7 @@ import com.group6.api.models.UsersPoint;
 import com.group6.api.services.FileService;
 import com.group6.api.services.InfluxDBSetupService;
 import com.group6.api.services.InfluxQueryService;
+import com.group6.api.services.MacTrackingService;
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
@@ -43,6 +44,9 @@ public class InfluxController {
 
 	@Autowired
 	private FileService fileService;
+	
+	@Autowired
+	private MacTrackingService macTrackingService;
 
 	/*
 	 * Return connection data by building
@@ -89,6 +93,21 @@ public class InfluxController {
 		}
 		return new ResponseEntity<Boolean>(connected, HttpStatus.OK);
 	}
+	
+	/*
+	 * Utilizes MacTrackingService.java to build a JsonObject of MAC address
+	 * information based on a range of dates. 
+	 */
+	@GetMapping("/generateMacData/s={startDate}/e={endDate}") 
+	private ResponseEntity<String> getMacTrackingJSON(@PathVariable String startDate, @PathVariable String endDate) { 
+		
+		String data = macTrackingService.generateMacAddressJSON(startDate, endDate);
+		
+		if (data == null) {
+			return new ResponseEntity<String>(data, HttpStatus.BAD_REQUEST);
+		}	
+		return new ResponseEntity<String>(data, HttpStatus.OK);
+	}
 
 	/*
 	 * Generates a CSV for download based on a specified set of data recieved from
@@ -100,14 +119,14 @@ public class InfluxController {
 
 		boolean downloadSuccess = false;
 		List<UsersPoint> csvList = influxQueryService.queryConstructor(dataSet);
-		String filename = "users.csv";
+		String filename = "data.csv";
 		response.setContentType("text/csv");
 		response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"");
 
 		StatefulBeanToCsv<UsersPoint> writer = new StatefulBeanToCsvBuilder<UsersPoint>(response.getWriter())
 				.withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(CSVWriter.DEFAULT_SEPARATOR)
 				.withOrderedResults(false).build();
-		if (fileService.getUsers(csvList) != null) {
+		if (csvList != null) {
 			writer.write(fileService.getUsers(csvList));
 			downloadSuccess = true;
 		} else {

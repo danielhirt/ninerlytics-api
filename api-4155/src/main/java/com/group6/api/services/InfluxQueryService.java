@@ -2,13 +2,8 @@ package com.group6.api.services;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import org.influxdb.dto.Query;
@@ -35,12 +30,9 @@ public class InfluxQueryService extends Constants {
 	@Autowired
 	private InfluxDBSetupService influxDBSetupService;
 
-	@Autowired
-	private DataProcessingService dataProcessingService;
-
 	private static final Logger logger = Logger.getLogger(InfluxController.class.getName());
 	private static final DateFormat formatter = new SimpleDateFormat("yyyy MMM dd HH:mm");
-
+	
 	/**
 	 * Executes a new query against InfluxDB to retrieve connection data specified
 	 * by query string
@@ -50,34 +42,18 @@ public class InfluxQueryService extends Constants {
 	 */
 	private List<UsersPoint> processInfluxQuery(String query) {
 		logger.info("Query recieved from queryConstructor " + query);
-
+		
 		QueryResult queryResult = influxDBSetupService.getConnection()
 				.query(new Query(query, influxDBSetupService.getDatabaseName()));
-		InfluxDBResultMapper resultMapper = new InfluxDBResultMapper();
+		InfluxDBResultMapper resultMapper = new InfluxDBResultMapper();	
 		List<UsersPoint> list = resultMapper.toPOJO(queryResult, UsersPoint.class);
-
-		dataProcessingService.processCoordinateData();
-		Set<Entry<String, ArrayList<Double>>> set = dataProcessingService.getBuildingCoordinateData().entrySet();
-
+		
 		for (UsersPoint obj : list) {
-
 			Date dateFormat = Date.from(obj.getTime());
 			String formattedDate = formatter.format(dateFormat);
 			obj.setDateAndTime(formattedDate);
-
-			Iterator<Entry<String, ArrayList<Double>>> itr = set.iterator();
-			while (itr.hasNext()) {
-				Map.Entry<String, ArrayList<Double>> entry = itr.next();
-
-				if (entry.getKey().equals(obj.getBuilding())) {
-
-					obj.setLatitude(entry.getValue().get(0));
-					obj.setLongitude(entry.getValue().get(1));
-
-				}
-			}
+			
 		}
-
 		logger.info("Size of processed query to be returned: " + list.size());
 		return list;
 	}

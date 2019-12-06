@@ -23,7 +23,8 @@ public class DataProcessingService extends Constants {
 
 	private static Map<String, ArrayList<Double>> mapCoordinatesData(String[] buildings) {
 		Map<String, ArrayList<Double>> coordinateMap = new HashMap<String, ArrayList<Double>>();
-
+		
+		// need to add rest of building mappings from GeoJSON
 		for (String entry : buildings) {
 			ArrayList<Double> coords = new ArrayList<Double>();
 			// temporary just to map these buildings to begin visualizing heatmap data
@@ -50,6 +51,7 @@ public class DataProcessingService extends Constants {
 		return coordinateMap;
 	}
 
+	
 	public Map<String, ArrayList<Double>> getBuildingCoordinateData() {
 		return buildingCoordinateData;
 	}

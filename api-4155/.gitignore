@@ -30,3 +30,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### security ignores ###
+/src/main/java/com/group6/api/controllers/ApplicationSecurityController.java
+/src/main/java/com/group6/api/services/ProfileService.java
+/src/main/java/com/group6/api/models/ProfileObject.java
+
+
