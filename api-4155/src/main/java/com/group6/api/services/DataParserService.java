@@ -57,7 +57,8 @@ public class DataParserService extends Constants {
         logger.info("PARSE COMPLETE");
     }
 
-    public void generateHashMap(String pathToFile) { 	
+    public void generateHashMap(String pathToFile) {
+    	
         try {
             Map<Date, ArrayList<String>> mapOfTimes = new HashMap<Date, ArrayList<String>>();
 
@@ -85,27 +86,29 @@ public class DataParserService extends Constants {
 
     private void getConnectAndDisconnect(Map<Date, ArrayList<String>> mapOfTimes) {
         SortedSet<Date> keys = new TreeSet<Date>(mapOfTimes.keySet());
-        
+
         Map<Date, Map<String, ArrayList<String>>> macMap = new HashMap<Date, Map<String, ArrayList<String>>>();
-        
-        InfluxDB db = InfluxDBFactory.connect("http://localhost:8086", "admin", "admin");
-        
-        String[] sysIPs = this.getSysIPs();
+
+        InfluxDB db = InfluxDBFactory.connect("http://campusheatmap.com:8086", "admin", "admin");
+
+        String[] sysIPs = {"10.47.128.140", "10.47.0.22", "10.47.0.23", "10.47.0.32", "10.47.0.33"};
 
         for (Date date : keys) {
             Map<String, ArrayList<String>> userConnected = new HashMap<String, ArrayList<String>>();
-            for (String data : mapOfTimes.get(date)) {        	
-                if (Arrays.stream(sysIPs).parallel().filter(data::contains).count() == 0) {              
-                    Pattern pat = Pattern.compile(": .{40}:"); // Mac Address Pattern                    
-                    Matcher mat = pat.matcher(data); // Check for Matches in data
-                 
+            for (String data : mapOfTimes.get(date)) {
+                if(Arrays.stream(sysIPs).parallel().filter(data::contains).count() == 0){
+                    // Mac Address Pattern
+                    Pattern pat = Pattern.compile(": .{44}:");
+                    // Check for Matches in data
+                    Matcher mat = pat.matcher(data);
                     if (mat.find()) { // If there is a Mac Address Found
-                        String mac = mat.group().substring(1, 42);
-                        if (userConnected.keySet().contains(mac)) {
+                        String mac = mat.group().substring(1, 42).trim();
+                        if(userConnected.keySet().contains(mac)){
                             ArrayList<String> str = userConnected.get(mac);
                             str.add(data);
                             userConnected.put(mac, str);
-                        } else {
+                        }
+                        else {
                             ArrayList<String> str = new ArrayList<String>();
                             str.add(data);
                             userConnected.put(mac, str);
@@ -118,64 +121,77 @@ public class DataParserService extends Constants {
         mapBuildings(macMap, db);
     }
 
-    private void mapBuildings(Map<Date, Map<String, ArrayList<String>>> macMap, InfluxDB db) {    	
-        String[] buildings = this.getBuildings();
+    private void mapBuildings(Map<Date, Map<String, ArrayList<String>>> macMap, InfluxDB db){
+        String[] buildings = {"Atki", "Barn", "Bioi", "Came", "CoEd", "Colv", "Cone", "Duke", "EPIC", "Faci", "FOPS", "Foun", "Fret", "Gade", "Grig", "Kenn", "King", "Laur", "Levi", 
+        "Lync", "Macy", "McMi", "Memo", "PORT", "Pros", "Robi", "Rowe", "Smit", "Stor", "StuU", "With", "Winn", "Wood", "HunH", "BelH", "CenC", "SVDH", "Tenn", "Harr", "RUP", "BandCor2", "StuH", 
+        "Heal", "Unio", "Stu-A", "Coun", "Irwi", "BelG", "McEn", "Frid", "Denn", "StuA", "Rece", "Rees", "Cato", "NCRC", "McCo", "Mart", "Auxi", "Gari", "Pros", "Cafe", "Burs"};
         
         Map<Date, ArrayList<String>> buildingsData = new HashMap<Date, ArrayList<String>>();
         try {
             for(Date date : macMap.keySet()){
                 ArrayList<String> formattedDatas = new ArrayList<String>();
                 for(String mac : macMap.get(date).keySet()){
-                    ArrayList<String> list = macMap.get(date).get(mac);
-                    for(String data : list){
+                    ArrayList<String> datas = macMap.get(date).get(mac);
+                    for(String data : datas){
                         String building = Arrays.stream(buildings).parallel().filter(data::contains).findAny().toString();
                         String buildName = building.substring(9, building.length() - 1);
-                        
-                        if (data.contains("Assoc success")) {
+                        if(data.contains("Assoc success")){
                             formattedDatas.add(mac + "+" + buildName);
-                        } else if (data.contains("Deauth")) {
+                        }
+                        else if (data.contains("Deauth")){
                             formattedDatas.add(mac + "-" + buildName);
                         }
                     }
                 }
                 buildingsData.put(date, formattedDatas);
-            }           
+            }
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
+        // DEPRECATED: addConnectedToInflux(date, connected, db);
         putDataIntoInflux(buildingsData, db);
     }
 
-    private void putDataIntoInflux(Map<Date, ArrayList<String>> buildingsData, InfluxDB db) {  	
-        String[] buildings = this.getBuildings();
+    private void putDataIntoInflux(Map<Date, ArrayList<String>> buildingsData, InfluxDB db){
+        String[] buildings = {"Atki", "Barn", "Bioi", "Came", "CoEd", "Colv", "Cone", "Duke", "EPIC", "Faci", "FOPS", "Foun", "Fret", "Gade", "Grig", "Kenn", "King", "Laur", "Levi", 
+        "Lync", "Macy", "McMi", "Memo", "PORT", "Pros", "Robi", "Rowe", "Smit", "Stor", "StuU", "With", "Winn", "Wood", "HunH", "BelH", "CenC", "SVDH", "Tenn", "Harr", "RUP", "BandCor2", "StuH", 
+        "Heal", "Unio", "Stu-A", "Coun", "Irwi", "BelG", "McEn", "Frid", "Denn", "StuA", "Rece", "Rees", "Cato", "NCRC", "McCo", "Mart", "Auxi", "Gari", "Pros", "Cafe", "Burs"};
+        
 
         BatchPoints aggregateBatchPoints = BatchPoints
-        .database("developmentDBConnections")
+        .database("dev-connDB")
         .build();
 
         BatchPoints macBatchPoints = BatchPoints
-        .database("developmentDBMacs")
+        .database("test-macDB")
         .build();
         
-        for(Date date : buildingsData.keySet()) {
+        for(Date date : buildingsData.keySet()){
             String[] array = buildingsData.get(date).toArray(new String[0]);
-            
-            for(String building : buildings) {
+            for(String building : buildings){
                 int connects = 0;
                 int disconnects = 0;
                 String connectedString = "+"+ building;
                 String disconnectedString = "-"+ building;
                 for(String data : array){
-                	
-                    if (data.contains(disconnectedString)) {
-                        disconnects++;
-                    } else if (data.contains(connectedString)) {
-                        connects++;
+                    if(data.contains(building)){
+                        if(data.contains(disconnectedString)){
+                            disconnects++;
+                        }
+                        else if (data.contains(connectedString)){
+                            connects++;
+                        }
+                        macBatchPoints = createMacPoints(date, data, building, db, macBatchPoints);
                     }
-                    macBatchPoints = createMacPoints(date, data, building, db, macBatchPoints);
                 }
-                aggregateBatchPoints = createAggregatePoint(date, connects, disconnects, building, db, aggregateBatchPoints);
-            }          
+                // DEPRECATED: int connected = connects - disconnects;
+                //System.out.println(connects);
+                if(connects != 0 || disconnects != 0){
+                    aggregateBatchPoints = createAggregatePoint(date, connects, disconnects, building, db, aggregateBatchPoints);
+                }
+            }
+            
         }
         uploadBatchpoints(db, aggregateBatchPoints);
         uploadBatchpoints(db, macBatchPoints);
@@ -183,31 +199,28 @@ public class DataParserService extends Constants {
 
     private static BatchPoints createMacPoints(Date date, String data, String building, InfluxDB db, BatchPoints batchPoints){
         String action = "";
-        if(data.substring(41, 42).equals("+")){
+        if(data.substring(40, 41).equals("+")){
             action = "Joined";
         } else {
             action = "Left";
         }
-        Point point = Point.measurement(data.substring(0, 41))
+        Point point = Point.measurement(data.substring(0, 40))
         .time(date.getTime(), TimeUnit.MILLISECONDS)
         .tag("Building", building)
         .addField("action", action)
         .build();
-
         batchPoints.point(point);
-
         return batchPoints;
     }
 
-    private static void uploadBatchpoints(InfluxDB db, BatchPoints batchPoints) {   	
-        if (!db.databaseExists(batchPoints.getDatabase())) {
+    private static void uploadBatchpoints(InfluxDB db, BatchPoints batchPoints){
+        if(!db.databaseExists(batchPoints.getDatabase())){
             db.createDatabase(batchPoints.getDatabase()); 
-        }      
-        db.write(batchPoints);   
-        logger.info("PARSE SUCCESS!");     
+        }
+       db.write(batchPoints);
     }
 
-    private static BatchPoints createAggregatePoint(Date date, int connected, int disconnected, String building, InfluxDB db, BatchPoints batchPoints) {
+    private static BatchPoints createAggregatePoint(Date date, int connected, int disconnected, String building, InfluxDB db, BatchPoints batchPoints){
         Point point = Point.measurement("connectionsByBuilding")
             .time(date.getTime(), TimeUnit.MILLISECONDS)
             .tag("Building", building)
@@ -216,7 +229,7 @@ public class DataParserService extends Constants {
             .build();
 
         batchPoints.point(point);
-        logger.info("Batchpoint Written: " + point.toString());
+        System.out.println("Batchpoint Written: " + point.toString());
         return batchPoints;
     }
 }

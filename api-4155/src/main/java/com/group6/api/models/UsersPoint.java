@@ -33,22 +33,14 @@ public class UsersPoint {
 	@Column(name = "Disconnected")
 	private Integer disconnections;
     
-    @CsvBindByPosition(position = 5)
-    private double latitude;
-    
-    @CsvBindByPosition(position = 6)
-    private double longitude;
-    
-    public UsersPoint() { }
-
-	public UsersPoint(Instant time, String dateAndTime, String building, Integer connections, Integer disconnections, double latitude, double longitude) {
+    public UsersPoint() {}
+   
+	public UsersPoint(Instant time, String dateAndTime, String building, Integer connections, Integer disconnections) {
 		this.time = time;
 		this.dateAndTime = dateAndTime;
 		this.building = building;
 		this.connections = connections;
 		this.disconnections = disconnections;
-		this.latitude = latitude;
-		this.longitude = longitude;
 	}
 
 	public Instant getTime() {
@@ -91,20 +83,10 @@ public class UsersPoint {
 		this.disconnections = disconnections;
 	}
 
-	public double getLatitude() {
-		return latitude;
-	}
-
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
-	}
-
-	public double getLongitude() {
-		return longitude;
-	}
-
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
+	@Override
+	public String toString() {
+		return "UsersPoint [time=" + time + ", dateAndTime=" + dateAndTime + ", building=" + building + ", connections="
+				+ connections + ", disconnections=" + disconnections + "]";
 	}
 
 	@Override
@@ -115,11 +97,6 @@ public class UsersPoint {
 		result = prime * result + ((connections == null) ? 0 : connections.hashCode());
 		result = prime * result + ((dateAndTime == null) ? 0 : dateAndTime.hashCode());
 		result = prime * result + ((disconnections == null) ? 0 : disconnections.hashCode());
-		long temp;
-		temp = Double.doubleToLongBits(latitude);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(longitude);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
 		result = prime * result + ((time == null) ? 0 : time.hashCode());
 		return result;
 	}
@@ -153,10 +130,6 @@ public class UsersPoint {
 				return false;
 		} else if (!disconnections.equals(other.disconnections))
 			return false;
-		if (Double.doubleToLongBits(latitude) != Double.doubleToLongBits(other.latitude))
-			return false;
-		if (Double.doubleToLongBits(longitude) != Double.doubleToLongBits(other.longitude))
-			return false;
 		if (time == null) {
 			if (other.time != null)
 				return false;
@@ -164,14 +137,7 @@ public class UsersPoint {
 			return false;
 		return true;
 	}
-
-	@Override
-	public String toString() {
-		return "UsersPoint [time=" + time + ", dateAndTime=" + dateAndTime + ", building=" + building + ", connections="
-				+ connections + ", disconnections=" + disconnections + ", latitude=" + latitude + ", longitude="
-				+ longitude + "]";
-	}
-
+    
 
 	
 	

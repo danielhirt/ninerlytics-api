@@ -119,14 +119,14 @@ public class InfluxController {
 
 		boolean downloadSuccess = false;
 		List<UsersPoint> csvList = influxQueryService.queryConstructor(dataSet);
-		String filename = "users.csv";
+		String filename = "data.csv";
 		response.setContentType("text/csv");
 		response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"");
 
 		StatefulBeanToCsv<UsersPoint> writer = new StatefulBeanToCsvBuilder<UsersPoint>(response.getWriter())
 				.withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(CSVWriter.DEFAULT_SEPARATOR)
 				.withOrderedResults(false).build();
-		if (fileService.getUsers(csvList) != null) {
+		if (csvList != null) {
 			writer.write(fileService.getUsers(csvList));
 			downloadSuccess = true;
 		} else {

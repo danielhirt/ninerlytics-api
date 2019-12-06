@@ -106,7 +106,7 @@ public class FileService {
 	}
 
 	/*
-	 * Logic to generate a CSV file for use in Jupyter for Carson <3
+	 * Logic to generate a CSV file 
 	 */
 	public List<UsersPoint> getUsers(List<UsersPoint> csvList) {
 		
@@ -114,7 +114,7 @@ public class FileService {
 		List<UsersPoint> users = new ArrayList<>();
 		for (UsersPoint list : csvList) {
 			users.add(new UsersPoint(list.getTime(), list.getDateAndTime(), list.getBuilding(), list.getConnections(),
-					list.getDisconnections(), list.getLatitude(), list.getLongitude()));
+					list.getDisconnections()));
 		}
 		
 		return users;
