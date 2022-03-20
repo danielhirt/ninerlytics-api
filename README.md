@@ -3,7 +3,7 @@ Upstream repository for back-end related code and resources.
 
 Documentation Author: Daniel Hirt, dhirt@uncc.edu
 
-UI Repo: https://github.com/danielhirt/ui-4155
+UI Repo: https://github.com/danielhirt/ninerlytics-ui
 
 ## Initial Setup & Dependencies
 
