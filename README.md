@@ -3,6 +3,8 @@ Upstream repository for back-end related code and resources.
 
 Documentation Author: Daniel Hirt, dhirt@uncc.edu
 
+UI Repo: https://github.com/danielhirt/ui-4155
+
 ## Initial Setup & Dependencies
 
 API Development Version: **v1.0.4-SPRT-3**
